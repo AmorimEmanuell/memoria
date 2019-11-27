@@ -6,29 +6,33 @@ using UnityEngine.UI;
 public class CardGridBuilder : MonoBehaviour
 {
     [SerializeField] private GridLayoutGroup _grid = default;
-    [SerializeField] private int _rows = 3;
-    [SerializeField] private int _columns = 4;
+    [SerializeField] private RectTransform _gridRectTransform;
 
-    private int _numberOfCells;
-    private List<Transform> _positions = new List<Transform>();
-
-    private void Awake()
-    {
-        CreateGrid(_rows, _columns);
-    }
+    private RectTransform[] _cells;
 
     public void CreateGrid(int rows, int columns)
     {
         _grid.constraintCount = columns;
 
-        _numberOfCells = rows * columns;
-        var gridTransform = _grid.transform;
+        var numberOfCells = rows * columns;
+        _cells = new RectTransform[numberOfCells];
 
-        for (var i = 0; i < _numberOfCells; i++)
+        for (var i = 0; i < numberOfCells; i++)
         {
-            var pos = new GameObject("pos" + i, typeof(RectTransform));
-            pos.transform.SetParent(gridTransform);
-            _positions.Add(pos.transform);
+            var cell = new GameObject("cell" + i, typeof(RectTransform));
+            cell.transform.SetParent(_gridRectTransform);
+            _cells[i] = cell.GetComponent<RectTransform>();
         }
+
+        LayoutRebuilder.ForceRebuildLayoutImmediate(_gridRectTransform);
+    }
+
+    public Vector3[] GetPositions()
+    {
+        var positions = new Vector3[_cells.Length];
+        for (var i = 0; i < positions.Length; i++)
+            positions[i] = _cells[i].position;
+
+        return positions;
     }
 }
