@@ -21,14 +21,15 @@ public class CardDataCollection : MonoBehaviour
         return ids;
     }
 
-    public Texture GetTexture(int cardId)
+    public CardData GetData(int cardId)
     {
         for (var i = 0; i < _data.Length; i++)
         {
             if (_data[i].Id == cardId)
-                return _data[i].Texture;
+                return _data[i];
         }
 
+        Debug.LogError($"CardDataCollection:GetData - CardId {cardId} not found!");
         return null;
     }
 }
