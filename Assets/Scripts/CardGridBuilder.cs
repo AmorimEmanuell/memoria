@@ -6,22 +6,22 @@ using UnityEngine.UI;
 public class CardGridBuilder : MonoBehaviour
 {
     [SerializeField] private GridLayoutGroup _grid = default;
-    [SerializeField] private RectTransform _gridRectTransform;
+    [SerializeField] private RectTransform _gridRectTransform = default;
 
-    private RectTransform[] _cells;
+    private List<Transform> _cells = new List<Transform>();
 
     public void CreateGrid(int rows, int columns)
     {
         _grid.constraintCount = columns;
 
         var numberOfCells = rows * columns;
-        _cells = new RectTransform[numberOfCells];
 
         for (var i = 0; i < numberOfCells; i++)
         {
             var cell = new GameObject("cell" + i, typeof(RectTransform));
             cell.transform.SetParent(_gridRectTransform);
-            _cells[i] = cell.GetComponent<RectTransform>();
+            cell.transform.localPosition = Vector3.zero;
+            _cells.Add(cell.transform);
         }
 
         LayoutRebuilder.ForceRebuildLayoutImmediate(_gridRectTransform);
@@ -29,7 +29,8 @@ public class CardGridBuilder : MonoBehaviour
 
     public Vector3[] GetPositions()
     {
-        var positions = new Vector3[_cells.Length];
+        var positions = new Vector3[_cells.Count];
+
         for (var i = 0; i < positions.Length; i++)
             positions[i] = _cells[i].position;
 
