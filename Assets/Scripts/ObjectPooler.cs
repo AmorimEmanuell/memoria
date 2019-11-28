@@ -10,7 +10,7 @@ public enum PoolItemType
 
 public class ObjectPooler : Singleton<ObjectPooler>
 {
-    [SerializeField] private List<ObjectPoolItem> _objectsToPool;
+    [SerializeField] private List<ObjectPoolItem> _objectsToPool = default;
 
     private Dictionary<PoolItemType, List<GameObject>> _pools = new Dictionary<PoolItemType, List<GameObject>>();
 
@@ -50,13 +50,19 @@ public class ObjectPooler : Singleton<ObjectPooler>
         _pools[itemType].Add(newObj);
         return newObj;
     }
+
+    public void Return(GameObject gameObject)
+    {
+        gameObject.SetActive(false);
+        gameObject.transform.SetParent(transform);
+    }
 }
 
 [System.Serializable]
 public class ObjectPoolItem
 {
-    [SerializeField] private PoolItemType _itemType;
-    [SerializeField] private GameObject _prefab;
+    [SerializeField] private PoolItemType _itemType = default;
+    [SerializeField] private GameObject _prefab = default;
 
     public PoolItemType ItemType
     {

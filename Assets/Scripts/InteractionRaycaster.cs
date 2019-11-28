@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -12,10 +13,24 @@ public class InteractionRaycaster : MonoBehaviour
     private Dictionary<Collider, IInteractable> _savedInteractables = new Dictionary<Collider, IInteractable>();
     private IInteractable _currentInteractable;
     private float _touchDownTime;
+    private bool _blockedInteraction;
     private RaycastHit[] _hit = new RaycastHit[1];
+
+    private void Awake()
+    {
+        Events.instance.AddListener<BlockCardSelectionEvent>(OnBlockCardSelectionEvent);
+    }
+
+    private void OnDestroy()
+    {
+        Events.instance.RemoveListener<BlockCardSelectionEvent>(OnBlockCardSelectionEvent);
+    }
 
     private void Update()
     {
+        if (_blockedInteraction)
+            return;
+
         if (Input.GetMouseButtonDown(0))
             HandleTouchDown();
         else if (Input.GetMouseButtonUp(0))
@@ -70,5 +85,10 @@ public class InteractionRaycaster : MonoBehaviour
         }
 
         return null;
+    }
+
+    private void OnBlockCardSelectionEvent(BlockCardSelectionEvent e)
+    {
+        _blockedInteraction = e.Block;
     }
 }
