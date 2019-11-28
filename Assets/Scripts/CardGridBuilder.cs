@@ -12,6 +12,9 @@ public class CardGridBuilder : MonoBehaviour
 
     public void CreateGrid(int rows, int columns)
     {
+        if (_cells.Count > 0)
+            Reset();
+
         _grid.constraintCount = columns;
 
         var numberOfCells = rows * columns;
@@ -26,6 +29,14 @@ public class CardGridBuilder : MonoBehaviour
         }
 
         LayoutRebuilder.ForceRebuildLayoutImmediate(_gridRectTransform);
+    }
+
+    private void Reset()
+    {
+        for (var i = 0; i < _cells.Count; i++)
+            ObjectPooler.Instance.Return(_cells[i].gameObject);
+
+        _cells.Clear();
     }
 
     public Vector3[] GetPositions()

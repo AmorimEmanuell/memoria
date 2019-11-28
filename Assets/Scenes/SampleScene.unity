@@ -545,8 +545,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1133f70affbadd48b9dfe4bdee83673, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _cardPrefab: {fileID: 6308715515483791312, guid: 97826936d57951b499222c6c80697b22,
-    type: 3}
   _gridBuilder: {fileID: 446512394}
   _collection: {fileID: 1612971703}
   _rows: 2
