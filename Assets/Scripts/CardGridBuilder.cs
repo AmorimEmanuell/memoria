@@ -18,9 +18,10 @@ public class CardGridBuilder : MonoBehaviour
 
         for (var i = 0; i < numberOfCells; i++)
         {
-            var cell = new GameObject("cell" + i, typeof(RectTransform));
+            var cell = ObjectPooler.Instance.Retrieve(PoolItemType.Cell);
             cell.transform.SetParent(_gridRectTransform);
             cell.transform.localPosition = Vector3.zero;
+            cell.SetActive(true);
             _cells.Add(cell.transform);
         }
 
