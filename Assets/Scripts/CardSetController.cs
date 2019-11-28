@@ -23,9 +23,10 @@ public class CardSetController : MonoBehaviour
 
         for (var i = 0; i < selectedCardsIds.Count; i++)
         {
-            var card = Instantiate(_cardPrefab, transform);
+            var card = ObjectPooler.Instance.Retrieve(PoolItemType.Card).GetComponent<CardController>();
             card.SetData(_collection.GetData(selectedCardsIds[i]));
             card.transform.position = positions[i];
+            card.gameObject.SetActive(true);
         }
     }
 
