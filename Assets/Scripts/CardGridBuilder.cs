@@ -8,12 +8,13 @@ public class CardGridBuilder : MonoBehaviour
     [SerializeField] private GridLayoutGroup _grid = default;
     [SerializeField] private RectTransform _gridRectTransform = default;
 
+    private const int MaxRows = 5, MaxColumns = 6;
+
     private List<Transform> _cells = new List<Transform>();
 
     public void CreateGrid(int rows, int columns)
     {
-        if (_cells.Count > 0)
-            Reset();
+        Reset();
 
         _grid.constraintCount = columns;
 
@@ -33,6 +34,9 @@ public class CardGridBuilder : MonoBehaviour
 
     private void Reset()
     {
+        if (_cells.Count == 0)
+            return;
+
         for (var i = 0; i < _cells.Count; i++)
             ObjectPooler.Instance.Return(_cells[i].gameObject);
 
