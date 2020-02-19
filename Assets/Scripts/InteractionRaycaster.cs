@@ -73,13 +73,15 @@ public class InteractionRaycaster : MonoBehaviour
         var ray = _camera.ScreenPointToRay(Input.mousePosition);
         if (Physics.RaycastNonAlloc(ray, _hit, Mathf.Infinity, _rayMask) > 0)
         {
-            if (_savedInteractables.ContainsKey(_hit[0].collider))
-                return _savedInteractables[_hit[0].collider];
+            var collider = _hit[0].collider;
 
-            var interactable = _hit[0].collider.GetComponent<IInteractable>();
+            if (_savedInteractables.ContainsKey(collider))
+                return _savedInteractables[collider];
+
+            var interactable = collider.GetComponent<IInteractable>();
             if (interactable != null)
             {
-                _savedInteractables.Add(_hit[0].collider, interactable);
+                _savedInteractables.Add(collider, interactable);
                 return interactable;
             }
         }

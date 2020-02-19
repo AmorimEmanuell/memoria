@@ -19,7 +19,7 @@ public class CardController : MonoBehaviour, IInteractable
     public void SetData(CardData data)
     {
         _frontFace.material.mainTexture = data.Texture;
-        CardId = data.Id;
+        CardId = data.GetId();
     }
 
     private void RevealFace()
