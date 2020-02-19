@@ -32,7 +32,7 @@ public class CardSetController : MonoBehaviour
         for (var i = 0; i < selectedCardsIds.Count; i++)
         {
             var card = ObjectPooler.Instance.Retrieve(PoolItemType.Card).GetComponent<CardController>();
-            card.SetData(_collection.GetData(selectedCardsIds[i]));
+            card.SetData(_collection.GetItem(selectedCardsIds[i]));
             card.transform.position = positions[i];
             card.OnRevealFace += Card_OnRevealFace;
             card.gameObject.SetActive(true);
