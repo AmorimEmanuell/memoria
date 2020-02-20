@@ -56,12 +56,9 @@ public class BattleManager : MonoBehaviour
 
     private void UpdateBattleStatus()
     {
-        if (_currentEnemy.IsAlive)
+        if (_currentEnemy.IsAlive && _cardSetController.RemainingPairs == 0)
         {
-            if (_cardSetController.RemainingPairs == 0)
-            {
-                _cardSetController.CreateNewSet(_currentEnemy.Data.GridSize.x, _currentEnemy.Data.GridSize.y);
-            }
+            _cardSetController.CreateNewSet(_currentEnemy.Data.GridSize.x, _currentEnemy.Data.GridSize.y);
         }
         else
         {

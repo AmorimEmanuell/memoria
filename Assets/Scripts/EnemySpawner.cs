@@ -16,7 +16,6 @@ public class EnemySpawner : MonoBehaviour
     {
         var enemyData = SelectEnemyFromCollection();
         var enemyController = GetEnemyController(enemyData);
-        enemyController.SetData(enemyData);
         return enemyController;
     }
 
@@ -41,10 +40,13 @@ public class EnemySpawner : MonoBehaviour
         {
             enemyController = _instantiatedEnemies[enemyData.GetId()];
             enemyController.gameObject.SetActive(true);
+            enemyController.ResetVisuals();
         }
         else
         {
             enemyController = Instantiate(enemyData.Prefab, _spawnLocation.position, _spawnLocation.rotation);
+            enemyController.SetData(enemyData);
+
             _instantiatedEnemies.Add(enemyData.GetId(), enemyController);
         }
 
