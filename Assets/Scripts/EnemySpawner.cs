@@ -8,18 +8,14 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField] private EnemyDataCollection _enemyCollection = default;
     [SerializeField] private Transform _spawnLocation = default;
 
-    private void Start()
-    {
-        //TODO: In the future if we have a list of enemies pre defined
-        //we can instantiate all of them ahead of time.
-        SpawnNewEnemy();
-    }
-
-    private void SpawnNewEnemy()
+    //TODO: In the future if we have a list of enemies pre defined
+    //we can instantiate all of them ahead of time.
+    public EnemyController SpawnNewEnemy()
     {
         var enemyData = SelectEnemyFromCollection();
         var enemyController = Instantiate(enemyData.Prefab, _spawnLocation.position, _spawnLocation.rotation);
         enemyController.SetData(enemyData);
+        return enemyController;
     }
 
     private EnemyData SelectEnemyFromCollection()
