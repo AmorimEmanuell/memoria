@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using DG.Tweening;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -22,22 +23,27 @@ public class EnemyController : MonoBehaviour
 
         _maxHealth = Data.Health;
         _healthSlider.maxValue = _maxHealth;
-        _healthSlider.value = _maxHealth;
 
-        SetCurrentHealth(Data.Health);
+        ResetVisuals();
     }
 
-    private void SetCurrentHealth(int health)
+    public void ResetVisuals()
     {
-        _currentHealth = health;
+        _healthSlider.value = _maxHealth;
+        _healthFill.color = _colorGradient.Evaluate(1);
+        _currentHealth = _maxHealth;
         _healthText.text = _currentHealth.ToString();
     }
 
     public void Damage(int damageDealt)
     {
         _currentHealth -= damageDealt;
-        _healthSlider.value = _currentHealth;
+        _currentHealth = Mathf.Clamp(_currentHealth, 0, _maxHealth);
+        var healthPercent = (float)_currentHealth / _maxHealth;
+
+        _healthSlider.DOValue(_currentHealth, 0.5f);
+        _healthFill.DOColor(_colorGradient.Evaluate(healthPercent), 0.5f);
+
         _healthText.text = Mathf.Clamp(_currentHealth, 0, _maxHealth).ToString();
-        //UpdateHealth
     }
 }
