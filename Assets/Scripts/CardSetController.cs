@@ -5,34 +5,32 @@ using UnityEngine;
 
 public class CardSetController : MonoBehaviour
 {
+    [SerializeField] private CardDataCollection _cardCollection = default;
     [SerializeField] private CardGridBuilder _gridBuilder = default;
-    [SerializeField] private CardDataCollection _collection = default;
-    [SerializeField] private int _rows = 2;
-    [SerializeField] private int _columns = 2;
 
     private CardController _lastRevealedCard;
-    private int _numberOfPairs;
+    private int _remainingPairs;
 
-    private void Start()
-    {
-        CreateNewSet();
-    }
+    public Action<CardController, CardController> OnPairFound;
+    public Action OnPairMiss;
 
-    private void CreateNewSet()
+    public int RemainingPairs => _remainingPairs;
+
+    public void CreateNewSet(int rows, int columns)
     {
-        _gridBuilder.CreateGrid(_rows, _columns);
+        _gridBuilder.CreateGrid(rows, columns);
         var positions = _gridBuilder.GetPositions();
 
-        _numberOfPairs = (_rows * _columns) / 2;
+        _remainingPairs = (rows * columns) / 2;
 
-        var selectedCardsIds = SelectCardsFromCollection(_collection.GetIds(), _numberOfPairs);
+        var selectedCardsIds = SelectCardsFromCollection(_cardCollection.GetIds(), _remainingPairs);
         selectedCardsIds.AddRange(new List<int>(selectedCardsIds));
         selectedCardsIds.Shuffle();
 
         for (var i = 0; i < selectedCardsIds.Count; i++)
         {
             var card = ObjectPooler.Instance.Retrieve(PoolItemType.Card).GetComponent<CardController>();
-            card.SetData(_collection.GetItem(selectedCardsIds[i]));
+            card.SetData(_cardCollection.GetItem(selectedCardsIds[i]));
             card.transform.position = positions[i];
             card.OnRevealFace += Card_OnRevealFace;
             card.gameObject.SetActive(true);
@@ -68,17 +66,18 @@ public class CardSetController : MonoBehaviour
             _lastRevealedCard.OnRevealFace -= Card_OnRevealFace;
             currentRevealedCard.OnRevealFace -= Card_OnRevealFace;
 
-            _lastRevealedCard.Shrink();
-            currentRevealedCard.Shrink(() =>
-            {
-                UnblockCardSelection();
-                CheckForEndOfGameSet();
-            });
+            _remainingPairs--;
+
+            Events.instance.Raise(new BlockCardSelectionEvent(false));
+
+            OnPairFound?.Invoke(_lastRevealedCard, currentRevealedCard);
         }
         else
         {
             _lastRevealedCard.HideFace();
             currentRevealedCard.HideFace(UnblockCardSelection);
+
+            OnPairMiss?.Invoke();
         }
 
         _lastRevealedCard = null;
@@ -87,11 +86,5 @@ public class CardSetController : MonoBehaviour
     private void UnblockCardSelection()
     {
         Events.instance.Raise(new BlockCardSelectionEvent(false));
-    }
-
-    private void CheckForEndOfGameSet()
-    {
-        if (--_numberOfPairs == 0)
-            CreateNewSet();
     }
 }

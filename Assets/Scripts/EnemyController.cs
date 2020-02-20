@@ -13,23 +13,18 @@ public class EnemyController : MonoBehaviour
 
     private int _currentHealth, _maxHealth;
 
-    private void Awake()
-    {
-        Events.instance.AddListener<PlayerAttackEvent>(OnPlayerAttack);
-    }
-
-    private void OnDestroy()
-    {
-        Events.instance.AddListener<PlayerAttackEvent>(OnPlayerAttack);
-    }
+    public EnemyData Data { get; private set; }
+    public bool IsAlive => _currentHealth > 0;
 
     public void SetData(EnemyData enemyData)
     {
-        _maxHealth = enemyData.Health;
+        Data = enemyData;
+
+        _maxHealth = Data.Health;
         _healthSlider.maxValue = _maxHealth;
         _healthSlider.value = _maxHealth;
 
-        SetCurrentHealth(enemyData.Health);
+        SetCurrentHealth(Data.Health);
     }
 
     private void SetCurrentHealth(int health)
@@ -38,8 +33,11 @@ public class EnemyController : MonoBehaviour
         _healthText.text = _currentHealth.ToString();
     }
 
-    private void OnPlayerAttack(PlayerAttackEvent e)
+    public void Damage(int damageDealt)
     {
+        _currentHealth -= damageDealt;
+        _healthSlider.value = _currentHealth;
+        _healthText.text = Mathf.Clamp(_currentHealth, 0, _maxHealth).ToString();
         //UpdateHealth
     }
 }
