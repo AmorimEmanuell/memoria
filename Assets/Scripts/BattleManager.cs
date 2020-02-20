@@ -29,6 +29,11 @@ public class BattleManager : MonoBehaviour
 
     private void CreateNewMatch()
     {
+        if (_currentEnemy != null)
+        {
+            _currentEnemy.gameObject.SetActive(false);
+        }
+
         _currentEnemy = _enemySpawner.SpawnNewEnemy();
         _cardSetController.CreateNewSet(_currentEnemy.Data.GridSize.x, _currentEnemy.Data.GridSize.y);
 
