@@ -8,7 +8,7 @@ public class CardGridBuilder : MonoBehaviour
     [SerializeField] private GridLayoutGroup _grid = default;
     [SerializeField] private RectTransform _gridRectTransform = default;
 
-    private const int MaxRows = 5, MaxColumns = 6;
+    private const int MaxRows = 6, MaxColumns = 6;
 
     private List<Transform> _cells = new List<Transform>();
 
