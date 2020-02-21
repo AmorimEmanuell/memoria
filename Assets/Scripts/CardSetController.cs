@@ -8,22 +8,21 @@ public class CardSetController : MonoBehaviour
     [SerializeField] private CardDataCollection _cardCollection = default;
     [SerializeField] private CardGridBuilder _gridBuilder = default;
 
+    public Action OnPairFound, OnPairMiss;
+    public int RemainingPairs => _remainingCards.Count / 2;
+
     private CardController _lastRevealedCard;
-    private int _remainingPairs;
-
-    public Action<CardController, CardController> OnPairFound;
-    public Action OnPairMiss;
-
-    public int RemainingPairs => _remainingPairs;
+    private List<CardController> _remainingCards = new List<CardController>();
 
     public void CreateNewSet(int rows, int columns)
     {
+        ClearRemainingCards();
+
         _gridBuilder.CreateGrid(rows, columns);
+
         var positions = _gridBuilder.GetPositions();
-
-        _remainingPairs = (rows * columns) / 2;
-
-        var selectedCardsIds = SelectCardsFromCollection(_cardCollection.GetIds(), _remainingPairs);
+        var numOfCardPairs = (rows * columns) / 2;
+        var selectedCardsIds = SelectCardsFromCollection(_cardCollection.GetIds(), numOfCardPairs);
         selectedCardsIds.AddRange(new List<int>(selectedCardsIds));
         selectedCardsIds.Shuffle();
 
@@ -34,6 +33,18 @@ public class CardSetController : MonoBehaviour
             card.transform.position = positions[i];
             card.OnRevealFace += Card_OnRevealFace;
             card.gameObject.SetActive(true);
+            card.IsInteractable = true;
+
+            _remainingCards.Add(card);
+        }
+    }
+
+    private void ClearRemainingCards()
+    {
+        for (var i = _remainingCards.Count - 1; i >= 0; i--)
+        {
+            _remainingCards[i].ReturnToPool();
+            _remainingCards.RemoveAt(i);
         }
     }
 
@@ -59,23 +70,22 @@ public class CardSetController : MonoBehaviour
             return;
         }
 
-        Events.instance.Raise(new BlockCardSelectionEvent(true));
-
         if (_lastRevealedCard.CardId == currentRevealedCard.CardId)
         {
             _lastRevealedCard.OnRevealFace -= Card_OnRevealFace;
+            _lastRevealedCard.Shrink();
+            _remainingCards.Remove(_lastRevealedCard);
+
             currentRevealedCard.OnRevealFace -= Card_OnRevealFace;
+            currentRevealedCard.Shrink();
+            _remainingCards.Remove(currentRevealedCard);
 
-            _remainingPairs--;
-
-            Events.instance.Raise(new BlockCardSelectionEvent(false));
-
-            OnPairFound?.Invoke(_lastRevealedCard, currentRevealedCard);
+            OnPairFound?.Invoke();
         }
         else
         {
             _lastRevealedCard.HideFace();
-            currentRevealedCard.HideFace(UnblockCardSelection);
+            currentRevealedCard.HideFace();
 
             OnPairMiss?.Invoke();
         }
@@ -83,8 +93,11 @@ public class CardSetController : MonoBehaviour
         _lastRevealedCard = null;
     }
 
-    private void UnblockCardSelection()
+    public void SetCardsInteractable(bool IsInteractable)
     {
-        Events.instance.Raise(new BlockCardSelectionEvent(false));
+        for (var i = 0; i < _remainingCards.Count; i++)
+        {
+            _remainingCards[i].IsInteractable = IsInteractable;
+        }
     }
 }

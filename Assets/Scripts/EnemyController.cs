@@ -1,4 +1,5 @@
 ﻿using DG.Tweening;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -12,10 +13,12 @@ public class EnemyController : MonoBehaviour
     [SerializeField] private Image _healthFill = default;
     [SerializeField] private Gradient _colorGradient = default;
 
-    private int _currentHealth, _maxHealth;
-
     public EnemyData Data { get; private set; }
-    public bool IsAlive => _currentHealth > 0;
+
+    private const float HealthAnimDuration = 0.5f;
+
+    private int _currentHealth, _maxHealth;
+    private Tweener _healthTweener;
 
     public void SetData(EnemyData enemyData)
     {
@@ -35,15 +38,24 @@ public class EnemyController : MonoBehaviour
         _healthText.text = _currentHealth.ToString();
     }
 
-    public void Damage(int damageDealt)
+    public bool Damage(int damageDealt, Action<bool> onHealthAnimComplete)
     {
         _currentHealth -= damageDealt;
         _currentHealth = Mathf.Clamp(_currentHealth, 0, _maxHealth);
         var healthPercent = (float)_currentHealth / _maxHealth;
 
-        _healthSlider.DOValue(_currentHealth, 0.5f);
-        _healthFill.DOColor(_colorGradient.Evaluate(healthPercent), 0.5f);
+        _healthFill.DOColor(_colorGradient.Evaluate(healthPercent), HealthAnimDuration);
+
+        if (_healthTweener != null)
+        {
+            _healthTweener.Kill();
+        }
+
+        _healthTweener = _healthSlider.DOValue(_currentHealth, HealthAnimDuration);
+        _healthTweener.OnComplete(() => onHealthAnimComplete(_currentHealth > 0));
 
         _healthText.text = Mathf.Clamp(_currentHealth, 0, _maxHealth).ToString();
+
+        return _currentHealth > 0;
     }
 }
