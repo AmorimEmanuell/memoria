@@ -5,8 +5,8 @@ using UnityEngine;
 
 public class BattleManager : MonoBehaviour
 {
-    [SerializeField] private CardSetController _cardSetController;
-    [SerializeField] private EnemySpawner _enemySpawner;
+    [SerializeField] private CardSetController _cardSetController = default;
+    [SerializeField] private EnemySpawner _enemySpawner = default;
 
     private EnemyController _currentEnemy;
 
@@ -36,29 +36,26 @@ public class BattleManager : MonoBehaviour
 
         _currentEnemy = _enemySpawner.SpawnNewEnemy();
         _cardSetController.CreateNewSet(_currentEnemy.Data.GridSize.x, _currentEnemy.Data.GridSize.y);
-
-        Events.instance.Raise(new BlockCardSelectionEvent(false));
     }
 
-    private void CardSet_OnPairFound(CardController card1, CardController card2)
+    private void CardSet_OnPairFound()
     {
-        //TODO: Throw at enemy and damage it
-        _currentEnemy.Damage(1);
+        var isEnemyAlive = _currentEnemy.Damage(1, UpdateBattleStatus);
 
-        if (!_currentEnemy.IsAlive)
+        if (!isEnemyAlive)
         {
-            Events.instance.Raise(new BlockCardSelectionEvent(true));
+            _cardSetController.SetCardsInteractable(false);
         }
-
-        card1.Shrink();
-        card2.Shrink(UpdateBattleStatus);
     }
 
-    private void UpdateBattleStatus()
+    private void UpdateBattleStatus(bool isEnemyAlive)
     {
-        if (_currentEnemy.IsAlive && _cardSetController.RemainingPairs == 0)
+        if (isEnemyAlive)
         {
-            _cardSetController.CreateNewSet(_currentEnemy.Data.GridSize.x, _currentEnemy.Data.GridSize.y);
+            if (_cardSetController.RemainingPairs == 0)
+            {
+                _cardSetController.CreateNewSet(_currentEnemy.Data.GridSize.x, _currentEnemy.Data.GridSize.y);
+            }
         }
         else
         {

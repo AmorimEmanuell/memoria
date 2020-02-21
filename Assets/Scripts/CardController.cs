@@ -11,10 +11,9 @@ public class CardController : MonoBehaviour, IInteractable
     public Action<CardController> OnRevealFace;
 
     public int CardId { get; private set; }
+    public bool IsInteractable { get; set; }
 
     private const float RotateDuration = 0.5f;
-
-    private bool _isRotating, _isRevealed;
 
     public void SetData(CardData data)
     {
@@ -24,48 +23,33 @@ public class CardController : MonoBehaviour, IInteractable
 
     private void RevealFace()
     {
-        _isRotating = true;
-        transform.DOLocalRotate(new Vector3(0f, 180f, 0f), RotateDuration).OnComplete(OnRevealFaceComplete);
-    }
-
-    private void OnRevealFaceComplete()
-    {
-        _isRotating = false;
-        _isRevealed = true;
-
-        OnRevealFace?.Invoke(this);
+        IsInteractable = false;
+        transform.DOLocalRotate(new Vector3(0f, 180f, 0f), RotateDuration).OnComplete(() =>
+        {
+            OnRevealFace?.Invoke(this);
+        });
     }
 
     public void HideFace(Action onComplete = null)
     {
-        _isRotating = true;
         transform.DOLocalRotate(new Vector3(0f, 0f, 0f), RotateDuration).OnComplete(() =>
         {
-            OnHideFaceComplete();
+            IsInteractable = true;
             onComplete?.Invoke();
         });
-    }
-
-    private void OnHideFaceComplete()
-    {
-        _isRotating = false;
-        _isRevealed = false;
     }
 
     public void Shrink(Action onComplete = null)
     {
         transform.DOScale(0f, RotateDuration).OnComplete(() =>
         {
-            OnRotateAndShrinkComplete();
+            ReturnToPool();
             onComplete?.Invoke();
         });
     }
 
-    private void OnRotateAndShrinkComplete()
+    public void ReturnToPool()
     {
-        _isRevealed = false;
-        _isRotating = false;
-
         transform.localScale = Vector3.one;
         transform.localRotation = Quaternion.identity;
 
@@ -74,8 +58,10 @@ public class CardController : MonoBehaviour, IInteractable
 
     public void OnClick()
     {
-        if (_isRotating || _isRevealed)
+        if (!IsInteractable)
+        {
             return;
+        }
 
         RevealFace();
     }
