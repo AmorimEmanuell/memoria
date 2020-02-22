@@ -8,13 +8,11 @@ public class CardGridBuilder : MonoBehaviour
     [SerializeField] private GridLayoutGroup _grid = default;
     [SerializeField] private RectTransform _gridRectTransform = default;
 
-    private const int MaxRows = 6, MaxColumns = 6;
-
     private List<Transform> _cells = new List<Transform>();
 
-    public void CreateGrid(int rows, int columns)
+    public Vector3[] CreateGrid(int rows, int columns)
     {
-        Reset();
+        ClearCells();
 
         _grid.constraintCount = columns;
 
@@ -30,9 +28,11 @@ public class CardGridBuilder : MonoBehaviour
         }
 
         LayoutRebuilder.ForceRebuildLayoutImmediate(_gridRectTransform);
+
+        return GetPositions();
     }
 
-    private void Reset()
+    private void ClearCells()
     {
         if (_cells.Count == 0)
             return;
@@ -43,7 +43,7 @@ public class CardGridBuilder : MonoBehaviour
         _cells.Clear();
     }
 
-    public Vector3[] GetPositions()
+    private Vector3[] GetPositions()
     {
         var positions = new Vector3[_cells.Count];
 

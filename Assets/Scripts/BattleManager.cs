@@ -35,7 +35,7 @@ public class BattleManager : MonoBehaviour
         }
 
         _currentEnemy = _enemySpawner.SpawnNewEnemy();
-        _cardSetController.CreateNewSet(_currentEnemy.Data.GridSize.x, _currentEnemy.Data.GridSize.y);
+        _cardSetController.SetupGame(_currentEnemy.Data.GridSize.x, _currentEnemy.Data.GridSize.y);
     }
 
     private void CardSet_OnPairFound()
@@ -54,7 +54,7 @@ public class BattleManager : MonoBehaviour
         {
             if (_cardSetController.RemainingPairs == 0)
             {
-                _cardSetController.CreateNewSet(_currentEnemy.Data.GridSize.x, _currentEnemy.Data.GridSize.y);
+                _cardSetController.SetupGame(_currentEnemy.Data.GridSize.x, _currentEnemy.Data.GridSize.y);
             }
         }
         else
