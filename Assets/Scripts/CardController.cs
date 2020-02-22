@@ -1,8 +1,8 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
-using System;
 
 public class CardController : MonoBehaviour, IInteractable
 {
@@ -14,6 +14,13 @@ public class CardController : MonoBehaviour, IInteractable
     public bool IsInteractable { get; set; }
 
     private const float RotateDuration = 0.5f;
+
+    private float _originalScale;
+
+    private void Awake()
+    {
+        _originalScale = transform.localScale.x;
+    }
 
     public void SetData(CardData data)
     {
@@ -50,7 +57,7 @@ public class CardController : MonoBehaviour, IInteractable
 
     public void ReturnToPool()
     {
-        transform.localScale = Vector3.one;
+        transform.localScale = Vector3.one * _originalScale;
         transform.localRotation = Quaternion.identity;
 
         ObjectPooler.Instance.Return(gameObject);
