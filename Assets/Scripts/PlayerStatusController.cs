@@ -54,7 +54,7 @@ public class PlayerStatusController : MonoBehaviour
     {
         _playerHealthSlider.maxValue = PlayerMaxHealth;
 
-        PlayerHealth = 2;
+        PlayerHealth = PlayerMaxHealth;
         PotionCount = PotionMaxCount;
     }
 
