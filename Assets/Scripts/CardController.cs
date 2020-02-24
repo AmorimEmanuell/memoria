@@ -16,6 +16,7 @@ public class CardController : MonoBehaviour, IInteractable
     private const float RotateDuration = 0.5f;
 
     private float _originalScale;
+    private bool _overrideIsInteractable;
 
     private void Awake()
     {
@@ -26,11 +27,14 @@ public class CardController : MonoBehaviour, IInteractable
     {
         _frontFace.material.mainTexture = data.Texture;
         CardId = data.GetId();
+
+        _overrideIsInteractable = true;
     }
 
     private void RevealFace()
     {
-        IsInteractable = false;
+        IsInteractable = false && _overrideIsInteractable;
+
         transform.DOLocalRotate(new Vector3(0f, 180f, 0f), RotateDuration).OnComplete(() =>
         {
             OnFaceRevealed?.Invoke(this);
@@ -41,7 +45,7 @@ public class CardController : MonoBehaviour, IInteractable
     {
         transform.DOLocalRotate(new Vector3(0f, 0f, 0f), RotateDuration).OnComplete(() =>
         {
-            IsInteractable = true;
+            IsInteractable = true && _overrideIsInteractable;
             onComplete?.Invoke();
         });
     }
@@ -55,12 +59,18 @@ public class CardController : MonoBehaviour, IInteractable
         });
     }
 
-    public void ReturnToPool()
+    private void ReturnToPool()
     {
         transform.localScale = Vector3.one * _originalScale;
         transform.localRotation = Quaternion.identity;
 
         ObjectPooler.Instance.Return(gameObject);
+    }
+
+    public void ForceIsInteractable(bool IsInteractable)
+    {
+        _overrideIsInteractable = IsInteractable;
+        this.IsInteractable = IsInteractable;
     }
 
     public void OnClick()

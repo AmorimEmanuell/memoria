@@ -78,7 +78,6 @@ public class BattleManager : MonoBehaviour
 
         if (!isPlayerAlive)
         {
-            //BUG: Cards shrinking reset their IsInteractable to true
             _cardSetController.SetCardsInteractable(false);
             _currentEnemy.StopAnyRoutine();
             //TODO: Game Over

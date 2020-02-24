@@ -22,11 +22,11 @@ public class CardSetController : MonoBehaviour
         for (var i = 0; i < _currentSet.Count; i++)
         {
             _currentSet[i].transform.position = gridPositions[i];
-            _currentSet[i].OnFaceRevealed += Card_OnRevealFace;
+            _currentSet[i].OnFaceRevealed += Card_OnFaceRevealed;
         }
     }
 
-    private void Card_OnRevealFace(CardController currentRevealedCard)
+    private void Card_OnFaceRevealed(CardController currentRevealedCard)
     {
         if (_lastRevealedCard == null)
         {
@@ -36,11 +36,11 @@ public class CardSetController : MonoBehaviour
 
         if (_lastRevealedCard.CardId == currentRevealedCard.CardId)
         {
-            _lastRevealedCard.OnFaceRevealed -= Card_OnRevealFace;
+            _lastRevealedCard.OnFaceRevealed -= Card_OnFaceRevealed;
             _lastRevealedCard.Shrink();
             _currentSet.Remove(_lastRevealedCard);
 
-            currentRevealedCard.OnFaceRevealed -= Card_OnRevealFace;
+            currentRevealedCard.OnFaceRevealed -= Card_OnFaceRevealed;
             currentRevealedCard.Shrink();
             _currentSet.Remove(currentRevealedCard);
 
@@ -61,7 +61,7 @@ public class CardSetController : MonoBehaviour
     {
         for (var i = 0; i < _currentSet.Count; i++)
         {
-            _currentSet[i].IsInteractable = IsInteractable;
+            _currentSet[i].ForceIsInteractable(IsInteractable);
         }
     }
 }
