@@ -22,7 +22,7 @@ public class CardSetController : MonoBehaviour
         for (var i = 0; i < _currentSet.Count; i++)
         {
             _currentSet[i].transform.position = gridPositions[i];
-            _currentSet[i].OnRevealFace += Card_OnRevealFace;
+            _currentSet[i].OnFaceRevealed += Card_OnRevealFace;
         }
     }
 
@@ -36,11 +36,11 @@ public class CardSetController : MonoBehaviour
 
         if (_lastRevealedCard.CardId == currentRevealedCard.CardId)
         {
-            _lastRevealedCard.OnRevealFace -= Card_OnRevealFace;
+            _lastRevealedCard.OnFaceRevealed -= Card_OnRevealFace;
             _lastRevealedCard.Shrink();
             _currentSet.Remove(_lastRevealedCard);
 
-            currentRevealedCard.OnRevealFace -= Card_OnRevealFace;
+            currentRevealedCard.OnFaceRevealed -= Card_OnRevealFace;
             currentRevealedCard.Shrink();
             _currentSet.Remove(currentRevealedCard);
 

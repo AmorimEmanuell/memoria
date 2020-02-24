@@ -13,11 +13,13 @@ public class EnemyController : MonoBehaviour
     [SerializeField] private Image _healthFill = default;
     [SerializeField] private Gradient _colorGradient = default;
 
+    public Action<int> OnAttack;
+
     public EnemyData Data { get; private set; }
 
     private const float HealthAnimDuration = 0.5f;
 
-    private int _currentHealth, _maxHealth;
+    private int _currentHealth, _maxHealth, _remainingTurnsToAttack;
     private Tweener _healthTweener;
 
     public void SetData(EnemyData enemyData)
@@ -26,11 +28,12 @@ public class EnemyController : MonoBehaviour
 
         _maxHealth = Data.Health;
         _healthSlider.maxValue = _maxHealth;
+        _remainingTurnsToAttack = Data.TurnsToAttack;
 
         ResetVisuals();
     }
 
-    public void ResetVisuals()
+    private void ResetVisuals()
     {
         _healthSlider.value = _maxHealth;
         _healthFill.color = _colorGradient.Evaluate(1);
@@ -57,5 +60,19 @@ public class EnemyController : MonoBehaviour
         _healthText.text = Mathf.Clamp(_currentHealth, 0, _maxHealth).ToString();
 
         return _currentHealth > 0;
+    }
+
+    public void CheckIfShouldAttack()
+    {
+        if (--_remainingTurnsToAttack == 0)
+        {
+            _remainingTurnsToAttack = Data.TurnsToAttack;
+            OnAttack?.Invoke(Data.AttackPower);
+        }
+    }
+
+    public void StopAnyRoutine()
+    {
+        //TODO: For enemies with "Active Batle Timer"
     }
 }

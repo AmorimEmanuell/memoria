@@ -7,6 +7,7 @@ public class BattleManager : MonoBehaviour
 {
     [SerializeField] private CardSetController _cardSetController = default;
     [SerializeField] private EnemySpawner _enemySpawner = default;
+    [SerializeField] private PlayerStatusController _playerStatus = default;
 
     private EnemyController _currentEnemy;
 
@@ -31,10 +32,13 @@ public class BattleManager : MonoBehaviour
     {
         if (_currentEnemy != null)
         {
+            _currentEnemy.OnAttack -= OnEnemyAttack;
             _currentEnemy.gameObject.SetActive(false);
         }
 
         _currentEnemy = _enemySpawner.SpawnNewEnemy();
+        _currentEnemy.OnAttack += OnEnemyAttack;
+
         _cardSetController.SetupGame(_currentEnemy.Data.GridSize.x, _currentEnemy.Data.GridSize.y);
     }
 
@@ -65,7 +69,19 @@ public class BattleManager : MonoBehaviour
 
     private void CardSet_OnPairMiss()
     {
-        //Verify if enemy makes attack
-        //throw new NotImplementedException();
+        _currentEnemy.CheckIfShouldAttack();
+    }
+
+    private void OnEnemyAttack(int atkPower)
+    {
+        var isPlayerAlive = _playerStatus.ReduceHealth(atkPower);
+
+        if (!isPlayerAlive)
+        {
+            //BUG: Cards shrinking reset their IsInteractable to true
+            _cardSetController.SetCardsInteractable(false);
+            _currentEnemy.StopAnyRoutine();
+            //TODO: Game Over
+        }
     }
 }
