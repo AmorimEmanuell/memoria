@@ -15,6 +15,7 @@ public class BattleManager : MonoBehaviour
     {
         _cardSetController.OnPairFound += CardSet_OnPairFound;
         _cardSetController.OnPairMiss += CardSet_OnPairMiss;
+        Events.instance.AddListener<RestartEvent>(OnGameRestart);
     }
 
     private void Start()
@@ -26,6 +27,7 @@ public class BattleManager : MonoBehaviour
     {
         _cardSetController.OnPairFound -= CardSet_OnPairFound;
         _cardSetController.OnPairMiss -= CardSet_OnPairMiss;
+        Events.instance.RemoveListener<RestartEvent>(OnGameRestart);
     }
 
     private void CreateNewMatch()
@@ -80,7 +82,13 @@ public class BattleManager : MonoBehaviour
         {
             _cardSetController.SetCardsInteractable(false);
             _currentEnemy.StopAnyRoutine();
-            //TODO: Game Over
+            Events.instance.Raise(new PlayerDefeatEvent());
         }
+    }
+
+    private void OnGameRestart(RestartEvent e)
+    {
+        _playerStatus.SetDefaultValues();
+        CreateNewMatch();
     }
 }

@@ -16,6 +16,8 @@ public class CardSetController : MonoBehaviour
 
     public void SetupGame(int rows, int cols)
     {
+        ClearRemainingCards();
+
         var gridPositions = _gridBuilder.CreateGrid(rows, cols);
         _currentSet = _setCreator.GetNewSet(rows, cols);
 
@@ -24,6 +26,19 @@ public class CardSetController : MonoBehaviour
             _currentSet[i].transform.position = gridPositions[i];
             _currentSet[i].OnFaceRevealed += Card_OnFaceRevealed;
         }
+
+        SetCardsInteractable(true);
+    }
+
+    private void ClearRemainingCards()
+    {
+        for (var i = 0; i < _currentSet.Count; i++)
+        {
+            _currentSet[i].OnFaceRevealed -= Card_OnFaceRevealed;
+            _currentSet[i].ReturnToPool();
+        }
+
+        _currentSet.Clear();
     }
 
     private void Card_OnFaceRevealed(CardController currentRevealedCard)
