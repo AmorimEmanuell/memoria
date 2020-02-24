@@ -10,6 +10,7 @@ public class PlayerStatusController : MonoBehaviour
     [SerializeField] private Button _potionBtn;
     [SerializeField] private TextMeshProUGUI _potionCountText;
     [SerializeField] private Slider _playerHealthSlider;
+    [SerializeField] private Gradient _colorGradient = default;
 
     private const int PlayerMaxHealth = 3, PotionMaxCount = 3;
 
@@ -20,13 +21,10 @@ public class PlayerStatusController : MonoBehaviour
         get { return _playerHealth; }
         set
         {
-            _playerHealth = value;
+            _playerHealth = Mathf.Clamp(value, 0, PlayerMaxHealth);
             _playerHealthSlider.value = _playerHealth;
 
-            if (_playerHealth == PlayerMaxHealth)
-            {
-                _potionBtn.interactable = false;
-            }
+            _potionBtn.interactable = _playerHealth > 0 && _playerHealth < PlayerMaxHealth;
         }
     }
 
@@ -35,7 +33,7 @@ public class PlayerStatusController : MonoBehaviour
         get { return _potionCount; }
         set
         {
-            _potionCount = value;
+            _potionCount = Mathf.Clamp(value, 0, PotionMaxCount);
             _potionCountText.text = _potionCount.ToString();
 
             if (_potionCount == 0)
@@ -67,5 +65,12 @@ public class PlayerStatusController : MonoBehaviour
     {
         PotionCount--;
         PlayerHealth++;
+    }
+
+    public bool ReduceHealth(int amount)
+    {
+        PlayerHealth -= amount;
+
+        return PlayerHealth > 0;
     }
 }

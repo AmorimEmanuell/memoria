@@ -8,7 +8,7 @@ public class CardController : MonoBehaviour, IInteractable
 {
     [SerializeField] private Renderer _frontFace = default;
 
-    public Action<CardController> OnRevealFace;
+    public Action<CardController> OnFaceRevealed;
 
     public int CardId { get; private set; }
     public bool IsInteractable { get; set; }
@@ -33,7 +33,7 @@ public class CardController : MonoBehaviour, IInteractable
         IsInteractable = false;
         transform.DOLocalRotate(new Vector3(0f, 180f, 0f), RotateDuration).OnComplete(() =>
         {
-            OnRevealFace?.Invoke(this);
+            OnFaceRevealed?.Invoke(this);
         });
     }
 
