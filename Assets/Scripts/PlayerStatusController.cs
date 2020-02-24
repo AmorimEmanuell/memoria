@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DG.Tweening;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,9 +11,11 @@ public class PlayerStatusController : MonoBehaviour
     [SerializeField] private Button _potionBtn;
     [SerializeField] private TextMeshProUGUI _potionCountText;
     [SerializeField] private Slider _playerHealthSlider;
+    [SerializeField] private Image _playerHealthFill;
     [SerializeField] private Gradient _colorGradient = default;
 
     private const int PlayerMaxHealth = 3, PotionMaxCount = 3;
+    private const float HealthAnimDuration = 0.5f;
 
     private int _playerHealth, _potionCount;
 
@@ -22,8 +25,6 @@ public class PlayerStatusController : MonoBehaviour
         set
         {
             _playerHealth = Mathf.Clamp(value, 0, PlayerMaxHealth);
-            _playerHealthSlider.value = _playerHealth;
-
             _potionBtn.interactable = _playerHealth > 0 && _playerHealth < PlayerMaxHealth;
         }
     }
@@ -35,11 +36,7 @@ public class PlayerStatusController : MonoBehaviour
         {
             _potionCount = Mathf.Clamp(value, 0, PotionMaxCount);
             _potionCountText.text = _potionCount.ToString();
-
-            if (_potionCount == 0)
-            {
-                _potionBtn.interactable = false;
-            }
+            _potionBtn.interactable = _potionCount > 0;
         }
     }
 
@@ -50,10 +47,11 @@ public class PlayerStatusController : MonoBehaviour
 
     private void Start()
     {
-        _playerHealthSlider.maxValue = PlayerMaxHealth;
-
         PlayerHealth = PlayerMaxHealth;
         PotionCount = PotionMaxCount;
+
+        _playerHealthSlider.maxValue = PlayerMaxHealth;
+        _playerHealthSlider.value = PlayerMaxHealth;
     }
 
     private void OnDestroy()
@@ -64,13 +62,22 @@ public class PlayerStatusController : MonoBehaviour
     private void OnPotionBtnClicked()
     {
         PotionCount--;
-        PlayerHealth++;
+        AddToHealth(1);
+    }
+
+    private void AddToHealth(int amount)
+    {
+        PlayerHealth += amount;
+
+        _playerHealthSlider.DOValue(_playerHealth, HealthAnimDuration);
+
+        var healthPercent = (float)_playerHealth / PlayerMaxHealth;
+        _playerHealthFill.DOColor(_colorGradient.Evaluate(healthPercent), HealthAnimDuration);
     }
 
     public bool ReduceHealth(int amount)
     {
-        PlayerHealth -= amount;
-
+        AddToHealth(-amount);
         return PlayerHealth > 0;
     }
 }
