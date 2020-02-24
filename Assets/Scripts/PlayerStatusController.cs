@@ -25,7 +25,7 @@ public class PlayerStatusController : MonoBehaviour
         set
         {
             _playerHealth = Mathf.Clamp(value, 0, PlayerMaxHealth);
-            _potionBtn.interactable = _playerHealth > 0 && _playerHealth < PlayerMaxHealth;
+            _potionBtn.interactable = _playerHealth > 0 && _playerHealth < PlayerMaxHealth && _potionCount > 0;
         }
     }
 
@@ -36,7 +36,7 @@ public class PlayerStatusController : MonoBehaviour
         {
             _potionCount = Mathf.Clamp(value, 0, PotionMaxCount);
             _potionCountText.text = _potionCount.ToString();
-            _potionBtn.interactable = _potionCount > 0;
+            _potionBtn.interactable = _playerHealth > 0 && _playerHealth < PlayerMaxHealth && _potionCount > 0;
         }
     }
 
@@ -47,16 +47,22 @@ public class PlayerStatusController : MonoBehaviour
 
     private void Start()
     {
-        PlayerHealth = PlayerMaxHealth;
-        PotionCount = PotionMaxCount;
-
-        _playerHealthSlider.maxValue = PlayerMaxHealth;
-        _playerHealthSlider.value = PlayerMaxHealth;
+        SetDefaultValues();
     }
 
     private void OnDestroy()
     {
         _potionBtn.onClick.RemoveAllListeners();
+    }
+
+    public void SetDefaultValues()
+    {
+        PlayerHealth = PlayerMaxHealth;
+        PotionCount = PotionMaxCount;
+
+        _playerHealthSlider.maxValue = PlayerMaxHealth;
+        _playerHealthSlider.value = PlayerMaxHealth;
+        _playerHealthFill.color = _colorGradient.Evaluate(1);
     }
 
     private void OnPotionBtnClicked()

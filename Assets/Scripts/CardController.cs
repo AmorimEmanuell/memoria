@@ -59,7 +59,7 @@ public class CardController : MonoBehaviour, IInteractable
         });
     }
 
-    private void ReturnToPool()
+    public void ReturnToPool()
     {
         transform.localScale = Vector3.one * _originalScale;
         transform.localRotation = Quaternion.identity;
