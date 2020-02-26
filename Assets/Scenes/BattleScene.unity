@@ -1105,7 +1105,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _cardSetController: {fileID: 1612971704}
   _enemySpawner: {fileID: 1050641255}
-  _playerStatus: {fileID: 1507749375}
+  _player: {fileID: 1507749375}
+  _camera: {fileID: 963194227}
 --- !u!4 &1022687850
 Transform:
   m_ObjectHideFlags: 0

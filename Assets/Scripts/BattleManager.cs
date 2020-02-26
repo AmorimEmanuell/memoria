@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DG.Tweening;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,7 +8,8 @@ public class BattleManager : MonoBehaviour
 {
     [SerializeField] private CardSetController _cardSetController = default;
     [SerializeField] private EnemySpawner _enemySpawner = default;
-    [SerializeField] private PlayerStatusController _playerStatus = default;
+    [SerializeField] private PlayerStatusController _player = default;
+    [SerializeField] private Camera _camera = default;
 
     private EnemyController _currentEnemy;
 
@@ -36,13 +38,13 @@ public class BattleManager : MonoBehaviour
     {
         if (_currentEnemy != null)
         {
-            _currentEnemy.OnAttack -= OnEnemyAttack;
+            _currentEnemy.OnAttackAnimationFinished -= OnEnemyAttack;
             _currentEnemy.OnDamageAnimationFinished -= UpdateBattleStatus;
             _currentEnemy.gameObject.SetActive(false);
         }
 
         _currentEnemy = _enemySpawner.SpawnNewEnemy();
-        _currentEnemy.OnAttack += OnEnemyAttack;
+        _currentEnemy.OnAttackAnimationFinished += OnEnemyAttack;
         _currentEnemy.OnDamageAnimationFinished += UpdateBattleStatus;
 
         _cardSetController.SetupNewGame(_currentEnemy.Data.GridSize.x, _currentEnemy.Data.GridSize.y);
@@ -81,7 +83,8 @@ public class BattleManager : MonoBehaviour
 
     private void OnEnemyAttack(int atkPower)
     {
-        var isPlayerAlive = _playerStatus.Damage(atkPower);
+        var isPlayerAlive = _player.Damage(atkPower);
+        _camera.DOShakePosition(.2f, .05f);
 
         if (!isPlayerAlive)
         {
@@ -93,7 +96,7 @@ public class BattleManager : MonoBehaviour
 
     private void OnGameRestart(RestartEvent e)
     {
-        _playerStatus.ResetValues();
+        _player.ResetValues();
         PrepareNextEnemy();
     }
 }

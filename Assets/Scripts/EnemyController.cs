@@ -14,7 +14,7 @@ public class EnemyController : MonoBehaviour
     [SerializeField] private Image _healthFill = default;
     [SerializeField] private Gradient _colorGradient = default;
 
-    public Action<int> OnAttack;
+    public Action<int> OnAttackAnimationFinished;
     public Action<bool> OnDamageAnimationFinished;
 
     public EnemyData Data { get; private set; }
@@ -22,20 +22,30 @@ public class EnemyController : MonoBehaviour
     private const float HealthAnimDuration = 0.5f;
     private const string
         GetHitTrigger = "GetHit",
-        AttackTrigger = "Attack",
-        PreparingAttackStageInt = "PreparingAttackStage",
+        RemainingTurnsToAttackInt = "RemainingTurnsToAttack",
         HealthInt = "Health";
 
     private int _currentHealth, _maxHealth, _remainingTurnsToAttack;
+    private int RemainingTurnsToAttack
+    {
+        get { return _remainingTurnsToAttack; }
+        set
+        {
+            _remainingTurnsToAttack = value;
+            _animator.SetInteger(RemainingTurnsToAttackInt, _remainingTurnsToAttack);
+        }
+    }
 
     private void Awake()
     {
         _animator.OnDamageAnimationFinished += () => OnDamageAnimationFinished?.Invoke(_currentHealth > 0);
+        _animator.OnAttackAnimationFinished += FinishAttack;
     }
 
     private void OnDestroy()
     {
         _animator.OnDamageAnimationFinished -= () => OnDamageAnimationFinished?.Invoke(_currentHealth > 0);
+        _animator.OnAttackAnimationFinished -= FinishAttack;
     }
 
     public void SetData(EnemyData enemyData)
@@ -44,7 +54,7 @@ public class EnemyController : MonoBehaviour
 
         _maxHealth = Data.Health;
         _healthSlider.maxValue = _maxHealth;
-        _remainingTurnsToAttack = Data.TurnsToAttack;
+        RemainingTurnsToAttack = Data.TurnsToAttack;
 
         ResetVisuals();
     }
@@ -75,10 +85,12 @@ public class EnemyController : MonoBehaviour
 
     public void CheckIfShouldAttack()
     {
-        if (--_remainingTurnsToAttack == 0)
-        {
-            _remainingTurnsToAttack = Data.TurnsToAttack;
-            OnAttack?.Invoke(Data.AttackPower);
-        }
+        RemainingTurnsToAttack--;
+    }
+
+    private void FinishAttack()
+    {
+        RemainingTurnsToAttack = Data.TurnsToAttack;
+        OnAttackAnimationFinished?.Invoke(Data.AttackPower);
     }
 }
