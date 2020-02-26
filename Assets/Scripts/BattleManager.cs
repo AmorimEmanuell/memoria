@@ -15,38 +15,42 @@ public class BattleManager : MonoBehaviour
     {
         _cardSetController.OnPairFound += CardSet_OnPairFound;
         _cardSetController.OnPairMiss += CardSet_OnPairMiss;
+
         Events.instance.AddListener<RestartEvent>(OnGameRestart);
     }
 
     private void Start()
     {
-        CreateNewMatch();
+        PrepareNextEnemy();
     }
 
     private void OnDestroy()
     {
         _cardSetController.OnPairFound -= CardSet_OnPairFound;
         _cardSetController.OnPairMiss -= CardSet_OnPairMiss;
+
         Events.instance.RemoveListener<RestartEvent>(OnGameRestart);
     }
 
-    private void CreateNewMatch()
+    private void PrepareNextEnemy()
     {
         if (_currentEnemy != null)
         {
             _currentEnemy.OnAttack -= OnEnemyAttack;
+            _currentEnemy.OnDamageAnimationFinished -= UpdateBattleStatus;
             _currentEnemy.gameObject.SetActive(false);
         }
 
         _currentEnemy = _enemySpawner.SpawnNewEnemy();
         _currentEnemy.OnAttack += OnEnemyAttack;
+        _currentEnemy.OnDamageAnimationFinished += UpdateBattleStatus;
 
-        _cardSetController.SetupGame(_currentEnemy.Data.GridSize.x, _currentEnemy.Data.GridSize.y);
+        _cardSetController.SetupNewGame(_currentEnemy.Data.GridSize.x, _currentEnemy.Data.GridSize.y);
     }
 
     private void CardSet_OnPairFound()
     {
-        var isEnemyAlive = _currentEnemy.Damage(1, UpdateBattleStatus);
+        var isEnemyAlive = _currentEnemy.Damage(1);
 
         if (!isEnemyAlive)
         {
@@ -60,12 +64,13 @@ public class BattleManager : MonoBehaviour
         {
             if (_cardSetController.RemainingPairs == 0)
             {
-                _cardSetController.SetupGame(_currentEnemy.Data.GridSize.x, _currentEnemy.Data.GridSize.y);
+                var enemyGrid = _currentEnemy.Data.GridSize;
+                _cardSetController.SetupNewGame(enemyGrid.x, enemyGrid.y);
             }
         }
         else
         {
-            CreateNewMatch();
+            PrepareNextEnemy();
         }
     }
 
@@ -76,19 +81,19 @@ public class BattleManager : MonoBehaviour
 
     private void OnEnemyAttack(int atkPower)
     {
-        var isPlayerAlive = _playerStatus.ReduceHealth(atkPower);
+        var isPlayerAlive = _playerStatus.Damage(atkPower);
 
         if (!isPlayerAlive)
         {
             _cardSetController.SetCardsInteractable(false);
-            _currentEnemy.StopAnyRoutine();
+
             Events.instance.Raise(new PlayerDefeatEvent());
         }
     }
 
     private void OnGameRestart(RestartEvent e)
     {
-        _playerStatus.SetDefaultValues();
-        CreateNewMatch();
+        _playerStatus.ResetValues();
+        PrepareNextEnemy();
     }
 }

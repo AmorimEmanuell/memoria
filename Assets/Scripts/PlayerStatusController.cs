@@ -47,7 +47,7 @@ public class PlayerStatusController : MonoBehaviour
 
     private void Start()
     {
-        SetDefaultValues();
+        ResetValues();
     }
 
     private void OnDestroy()
@@ -55,7 +55,7 @@ public class PlayerStatusController : MonoBehaviour
         _potionBtn.onClick.RemoveAllListeners();
     }
 
-    public void SetDefaultValues()
+    public void ResetValues()
     {
         PlayerHealth = PlayerMaxHealth;
         PotionCount = PotionMaxCount;
@@ -81,7 +81,7 @@ public class PlayerStatusController : MonoBehaviour
         _playerHealthFill.DOColor(_colorGradient.Evaluate(healthPercent), HealthAnimDuration);
     }
 
-    public bool ReduceHealth(int amount)
+    public bool Damage(int amount)
     {
         AddToHealth(-amount);
         return PlayerHealth > 0;

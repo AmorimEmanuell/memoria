@@ -14,7 +14,7 @@ public class CardSetController : MonoBehaviour
     private CardController _lastRevealedCard;
     private List<CardController> _currentSet = new List<CardController>();
 
-    public void SetupGame(int rows, int cols)
+    public void SetupNewGame(int rows, int cols)
     {
         ClearRemainingCards();
 
