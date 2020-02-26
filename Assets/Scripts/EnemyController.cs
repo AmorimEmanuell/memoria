@@ -8,19 +8,35 @@ using UnityEngine.UI;
 
 public class EnemyController : MonoBehaviour
 {
+    [SerializeField] private AnimatorController _animator = default;
     [SerializeField] private Slider _healthSlider = default;
     [SerializeField] private TextMeshProUGUI _healthText = default;
     [SerializeField] private Image _healthFill = default;
     [SerializeField] private Gradient _colorGradient = default;
 
     public Action<int> OnAttack;
+    public Action<bool> OnDamageAnimationFinished;
 
     public EnemyData Data { get; private set; }
 
     private const float HealthAnimDuration = 0.5f;
+    private const string
+        GetHitTrigger = "GetHit",
+        AttackTrigger = "Attack",
+        PreparingAttackStageInt = "PreparingAttackStage",
+        HealthInt = "Health";
 
     private int _currentHealth, _maxHealth, _remainingTurnsToAttack;
-    private Tweener _healthTweener;
+
+    private void Awake()
+    {
+        _animator.OnDamageAnimationFinished += () => OnDamageAnimationFinished?.Invoke(_currentHealth > 0);
+    }
+
+    private void OnDestroy()
+    {
+        _animator.OnDamageAnimationFinished -= () => OnDamageAnimationFinished?.Invoke(_currentHealth > 0);
+    }
 
     public void SetData(EnemyData enemyData)
     {
@@ -41,23 +57,18 @@ public class EnemyController : MonoBehaviour
         _healthText.text = _currentHealth.ToString();
     }
 
-    public bool Damage(int damageDealt, Action<bool> onHealthAnimComplete)
+    public bool Damage(int damageDealt)
     {
         _currentHealth -= damageDealt;
         _currentHealth = Mathf.Clamp(_currentHealth, 0, _maxHealth);
+
+        _animator.SetInteger(HealthInt, _currentHealth);
+        _animator.SetTrigger(GetHitTrigger);
+
         var healthPercent = (float)_currentHealth / _maxHealth;
-
         _healthFill.DOColor(_colorGradient.Evaluate(healthPercent), HealthAnimDuration);
-
-        if (_healthTweener != null)
-        {
-            _healthTweener.Kill();
-        }
-
-        _healthTweener = _healthSlider.DOValue(_currentHealth, HealthAnimDuration);
-        _healthTweener.OnComplete(() => onHealthAnimComplete(_currentHealth > 0));
-
-        _healthText.text = Mathf.Clamp(_currentHealth, 0, _maxHealth).ToString();
+        _healthSlider.DOValue(_currentHealth, HealthAnimDuration);
+        _healthText.text = _currentHealth.ToString();
 
         return _currentHealth > 0;
     }
@@ -69,10 +80,5 @@ public class EnemyController : MonoBehaviour
             _remainingTurnsToAttack = Data.TurnsToAttack;
             OnAttack?.Invoke(Data.AttackPower);
         }
-    }
-
-    public void StopAnyRoutine()
-    {
-        //TODO: For enemies with "Active Batle Timer"
     }
 }
