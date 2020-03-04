@@ -38,8 +38,8 @@ public class EnemySpawner : MonoBehaviour
         if (_instantiatedEnemies.ContainsKey(enemyData.GetId()))
         {
             enemyController = _instantiatedEnemies[enemyData.GetId()];
-            enemyController.SetData(enemyData);
             enemyController.gameObject.SetActive(true);
+            enemyController.SetData(enemyData);
         }
         else
         {
