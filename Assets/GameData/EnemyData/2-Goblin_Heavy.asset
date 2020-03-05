@@ -17,4 +17,4 @@ MonoBehaviour:
   _turnsToAttack: 3
   _attackPower: 2
   _gridSize: {x: 2, y: 4}
-  _prefab: {fileID: 4507493391759318017, guid: d61f175a5926a784b920d68cc38a0b80, type: 3}
+  _model: {fileID: 1919012471076396, guid: 55776efecb0cd134ea5f418c2f97a705, type: 3}

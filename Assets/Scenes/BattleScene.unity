@@ -1240,6 +1240,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _enemyCollection: {fileID: 1050641256}
+  _enemyControllerPrefab: {fileID: 4507493391759318017, guid: d61f175a5926a784b920d68cc38a0b80,
+    type: 3}
   _spawnLocation: {fileID: 778733612}
 --- !u!114 &1050641256
 MonoBehaviour:
