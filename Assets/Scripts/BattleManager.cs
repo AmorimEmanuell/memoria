@@ -47,7 +47,13 @@ public class BattleManager : MonoBehaviour
         _currentEnemy.OnAttackAnimationFinished += OnEnemyAttack;
         _currentEnemy.OnDamageAnimationFinished += UpdateBattleStatus;
 
-        _cardSetController.SetupNewGame(_currentEnemy.Data.GridSize.x, _currentEnemy.Data.GridSize.y);
+        CreateNewGameSet();
+    }
+
+    private void CreateNewGameSet()
+    {
+        var enemyGrid = _currentEnemy.GridSize;
+        _cardSetController.SetupNewGame(enemyGrid.x, enemyGrid.y);
     }
 
     private void CardSet_OnPairFound()
@@ -66,8 +72,7 @@ public class BattleManager : MonoBehaviour
         {
             if (_cardSetController.RemainingPairs == 0)
             {
-                var enemyGrid = _currentEnemy.Data.GridSize;
-                _cardSetController.SetupNewGame(enemyGrid.x, enemyGrid.y);
+                CreateNewGameSet();
             }
         }
         else

@@ -6,6 +6,7 @@ using UnityEngine;
 public class EnemySpawner : MonoBehaviour
 {
     [SerializeField] private EnemyDataCollection _enemyCollection = default;
+    [SerializeField] private EnemyController _enemyControllerPrefab = default;
     [SerializeField] private Transform _spawnLocation = default;
 
     private Dictionary<int, EnemyController> _instantiatedEnemies = new Dictionary<int, EnemyController>();
@@ -39,12 +40,20 @@ public class EnemySpawner : MonoBehaviour
         {
             enemyController = _instantiatedEnemies[enemyData.GetId()];
             enemyController.gameObject.SetActive(true);
-            enemyController.SetData(enemyData);
+            enemyController.ResetDefaultProperties();
         }
         else
         {
-            enemyController = Instantiate(enemyData.Prefab, _spawnLocation.position, _spawnLocation.rotation);
-            enemyController.SetData(enemyData);
+            var enemyModel = Instantiate(enemyData.Model);
+            enemyController = Instantiate(_enemyControllerPrefab, _spawnLocation.position, _spawnLocation.rotation);
+            enemyController.InitializeProperties(
+                enemyData.Health,
+                enemyData.GridSize,
+                enemyData.TurnsToAttack,
+                enemyData.AttackPower,
+                enemyModel);
+
+            enemyController.ResetDefaultProperties();
 
             _instantiatedEnemies.Add(enemyData.GetId(), enemyController);
         }

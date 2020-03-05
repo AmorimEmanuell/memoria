@@ -10,13 +10,13 @@ public class EnemyData : ScriptableObject, ICollectionItem
     [SerializeField] private int _turnsToAttack = default;
     [SerializeField] private int _attackPower = default;
     [SerializeField] private Vector2Int _gridSize = default;
-    [SerializeField] private EnemyController _prefab = default;
+    [SerializeField] private GameObject _model = default;
 
     public int Health => _health;
     public int TurnsToAttack => _turnsToAttack;
     public int AttackPower => _attackPower;
     public Vector2Int GridSize => _gridSize;
-    public EnemyController Prefab => _prefab;
+    public GameObject Model => _model;
 
     public int GetId()
     {
