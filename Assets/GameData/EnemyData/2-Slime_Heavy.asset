@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7c380cb61d5dc6e4db7d71c0d23d22e8, type: 3}
-  m_Name: 1-Goblin_Mid
+  m_Name: 2-Slime_Heavy
   m_EditorClassIdentifier: 
-  _id: 1
-  _health: 3
+  _id: 2
+  _health: 4
   _turnsToAttack: 3
-  _attackPower: 1
-  _gridSize: {x: 3, y: 2}
+  _attackPower: 2
+  _gridSize: {x: 2, y: 4}
   _model: {fileID: 1919012471076396, guid: 55776efecb0cd134ea5f418c2f97a705, type: 3}
