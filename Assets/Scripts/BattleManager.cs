@@ -1,5 +1,4 @@
-﻿using DG.Tweening;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,8 +7,7 @@ public class BattleManager : MonoBehaviour
 {
     [SerializeField] private CardSetController _cardSetController = default;
     [SerializeField] private EnemySpawner _enemySpawner = default;
-    [SerializeField] private PlayerStatusController _player = default;
-    [SerializeField] private Camera _camera = default;
+    [SerializeField] private PlayerStatus _player = default;
 
     private EnemyController _currentEnemy;
 
@@ -88,8 +86,7 @@ public class BattleManager : MonoBehaviour
 
     private void OnEnemyAttack(int atkPower)
     {
-        var isPlayerAlive = _player.Damage(atkPower);
-        _camera.DOShakePosition(.2f, .05f);
+        var isPlayerAlive = _player.ApplyDamage(atkPower);
 
         if (!isPlayerAlive)
         {
@@ -101,7 +98,7 @@ public class BattleManager : MonoBehaviour
 
     private void OnGameRestart(RestartEvent e)
     {
-        _player.ResetValues();
+        _player.ResetDefaultValues();
         PrepareNextEnemy();
     }
 }

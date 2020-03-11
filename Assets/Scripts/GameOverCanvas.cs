@@ -6,8 +6,8 @@ using UnityEngine.UI;
 
 public class GameOverCanvas : MonoBehaviour
 {
-    [SerializeField] private Canvas _canvas;
-    [SerializeField] private Button _restartBtn;
+    [SerializeField] private Canvas _canvas = default;
+    [SerializeField] private Button _restartBtn = default;
 
     private void Awake()
     {
