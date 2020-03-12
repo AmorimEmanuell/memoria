@@ -9,9 +9,8 @@ public class PlayerStatus : MonoBehaviour
     [SerializeField] private PlayerHUDController _hudController = default;
     [SerializeField] private Camera _camera = default;
 
-    private int _currentHealth;
-    private int _currentPotions;
-    private float HealthPercentage => _currentHealth / Data.MaxHealth;
+    private int _currentHealth, _currentPotions;
+    private float HealthPercentage => (float)_currentHealth / Data.MaxHealth;
 
     public PlayerSaveData Data { get; private set; }
 
@@ -59,9 +58,9 @@ public class PlayerStatus : MonoBehaviour
             _currentPotions > 0;
     }
 
-    public bool ApplyDamage(int damagePower)
+    public bool ApplyDamage(int damageReceived)
     {
-        _currentHealth -= damagePower;
+        _currentHealth -= damageReceived;
         _currentHealth = Mathf.Clamp(_currentHealth, 0, Data.MaxHealth);
 
         _hudController.UpdateHealth(_currentHealth, HealthPercentage);

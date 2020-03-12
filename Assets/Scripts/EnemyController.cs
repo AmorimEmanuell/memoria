@@ -9,43 +9,21 @@ using UnityEngine.UI;
 public class EnemyController : MonoBehaviour
 {
     [SerializeField] private Transform _modelContainer = default;
-
-    [Header("HUD")]
-    [SerializeField] private Slider _healthSlider = default;
-    [SerializeField] private TextMeshProUGUI _healthText = default;
-    [SerializeField] private Image _healthFill = default;
-    [SerializeField] private Gradient _colorGradient = default;
-
-    public Action<int> OnAttackAnimationFinished;
-    public Action<bool> OnDamageAnimationFinished;
-
-    public int TotalHealth { get; private set; }
-    public Vector2Int GridSize { get; private set; }
-    public int TurnsToAttack { get; private set; }
-    public int AttackPower { get; private set; }
-
-    private const float HealthAnimDuration = 0.5f;
+    [SerializeField] private EnemyHUDController _hudController = default;
 
     private const string
         GetHitTrigger = "GetHit",
         RemainingTurnsToAttackInt = "RemainingTurnsToAttack",
         HealthInt = "Health";
 
-    private AnimatorController _animator;
+    private EnemyAnimatorController _animator;
+    private int _currentHealth, _remainingTurnsToAttack;
+    private float HealthPercentage => (float)_currentHealth / Data.MaxHealth;
 
-    private int
-        _currentHealth,
-        _remainingTurnsToAttack;
+    public Action<int> OnAttackAnimationFinished;
+    public Action<bool> OnDamageAnimationFinished;
 
-    private int RemainingTurnsToAttack
-    {
-        get { return _remainingTurnsToAttack; }
-        set
-        {
-            _remainingTurnsToAttack = value;
-            _animator.SetInteger(RemainingTurnsToAttackInt, _remainingTurnsToAttack);
-        }
-    }
+    public EnemyData Data { get; private set; }
 
     private void OnDestroy()
     {
@@ -53,60 +31,53 @@ public class EnemyController : MonoBehaviour
         _animator.OnAttackAnimationFinished -= FinishAttackAnimation;
     }
 
-    public void InitializeProperties(int totalHealth, Vector2Int gridSize, int turnsToAttack, int attackPower, GameObject model)
+    public void SetData(EnemyData data)
     {
-        AttachModelToContainer(model);
-
-        TotalHealth = totalHealth;
-        GridSize = gridSize;
-        TurnsToAttack = turnsToAttack;
-        AttackPower = attackPower;
-
-        _healthSlider.maxValue = TotalHealth;
+        Data = data;
+        LoadModelInContainer(data.ModelPrefab);
+        ResetDefaultProperties();
     }
 
-    private void AttachModelToContainer(GameObject model)
+    private void LoadModelInContainer(GameObject modelPrefab)
     {
-        model.transform.SetParent(_modelContainer);
-        model.transform.localPosition = Vector3.zero;
-        model.transform.localRotation = Quaternion.identity;
+        var model = Instantiate(modelPrefab, _modelContainer);
 
-        _animator = model.AddComponent<AnimatorController>();
-
+        _animator = model.AddComponent<EnemyAnimatorController>();
         _animator.OnDamageAnimationFinished += FinishDamageAnimation;
         _animator.OnAttackAnimationFinished += FinishAttackAnimation;
     }
 
     public void ResetDefaultProperties()
     {
-        _currentHealth = TotalHealth;
+        _currentHealth = Data.MaxHealth;
+        _hudController.SetInitialValues(Data.MaxHealth);
 
-        _healthSlider.value = _currentHealth;
-        _healthFill.color = _colorGradient.Evaluate(1);
-        _healthText.text = _currentHealth.ToString();
-
-        RemainingTurnsToAttack = TurnsToAttack;
+        ResetRemainingTurnsToAttack();
     }
 
-    public bool Damage(int damageReceived)
+    public bool ApplyDamage(int damageReceived)
     {
         _currentHealth -= damageReceived;
-        _currentHealth = Mathf.Clamp(_currentHealth, 0, TotalHealth);
+        _currentHealth = Mathf.Clamp(_currentHealth, 0, Data.MaxHealth);
 
         _animator.SetInteger(HealthInt, _currentHealth);
         _animator.SetTrigger(GetHitTrigger);
 
-        var healthPercent = (float)_currentHealth / TotalHealth;
-        _healthFill.DOColor(_colorGradient.Evaluate(healthPercent), HealthAnimDuration);
-        _healthSlider.DOValue(_currentHealth, HealthAnimDuration);
-        _healthText.text = _currentHealth.ToString();
+        _hudController.UpdateHealth(_currentHealth, HealthPercentage);
 
         return _currentHealth > 0;
     }
 
     public void CheckIfShouldAttack()
     {
-        RemainingTurnsToAttack--;
+        _remainingTurnsToAttack--;
+        _animator.SetInteger(RemainingTurnsToAttackInt, _remainingTurnsToAttack);
+    }
+
+    private void ResetRemainingTurnsToAttack()
+    {
+        _remainingTurnsToAttack = Data.TurnsToAttack;
+        _animator.SetInteger(RemainingTurnsToAttackInt, Data.TurnsToAttack);
     }
 
     private void FinishDamageAnimation()
@@ -116,7 +87,7 @@ public class EnemyController : MonoBehaviour
 
     private void FinishAttackAnimation()
     {
-        RemainingTurnsToAttack = TurnsToAttack;
-        OnAttackAnimationFinished?.Invoke(AttackPower);
+        ResetRemainingTurnsToAttack();
+        OnAttackAnimationFinished?.Invoke(Data.AttackPower);
     }
 }

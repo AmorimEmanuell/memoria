@@ -50,13 +50,13 @@ public class BattleManager : MonoBehaviour
 
     private void CreateNewGameSet()
     {
-        var enemyGrid = _currentEnemy.GridSize;
+        var enemyGrid = _currentEnemy.Data.GridSize;
         _cardSetController.SetupNewGame(enemyGrid.x, enemyGrid.y);
     }
 
     private void CardSet_OnPairFound()
     {
-        var isEnemyAlive = _currentEnemy.Damage(1);
+        var isEnemyAlive = _currentEnemy.ApplyDamage(1);
 
         if (!isEnemyAlive)
         {

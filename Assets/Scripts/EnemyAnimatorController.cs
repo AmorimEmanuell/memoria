@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Animator))]
-public class AnimatorController : MonoBehaviour
+public class EnemyAnimatorController : MonoBehaviour
 {
     public Action OnDamageAnimationFinished, OnAttackAnimationFinished;
 
