@@ -12,11 +12,11 @@ public class EnemyData : ScriptableObject, ICollectionItem
     [SerializeField] private Vector2Int _gridSize = default;
     [SerializeField] private GameObject _model = default;
 
-    public int Health => _health;
+    public int MaxHealth => _health;
     public int TurnsToAttack => _turnsToAttack;
     public int AttackPower => _attackPower;
     public Vector2Int GridSize => _gridSize;
-    public GameObject Model => _model;
+    public GameObject ModelPrefab => _model;
 
     public int GetId()
     {

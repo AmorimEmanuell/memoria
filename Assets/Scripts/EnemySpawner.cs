@@ -44,16 +44,8 @@ public class EnemySpawner : MonoBehaviour
         }
         else
         {
-            var enemyModel = Instantiate(enemyData.Model);
             enemyController = Instantiate(_enemyControllerPrefab, _spawnLocation.position, _spawnLocation.rotation);
-            enemyController.InitializeProperties(
-                enemyData.Health,
-                enemyData.GridSize,
-                enemyData.TurnsToAttack,
-                enemyData.AttackPower,
-                enemyModel);
-
-            enemyController.ResetDefaultProperties();
+            enemyController.SetData(enemyData);
 
             _instantiatedEnemies.Add(enemyData.GetId(), enemyController);
         }

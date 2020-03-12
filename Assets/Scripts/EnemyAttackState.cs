@@ -19,7 +19,7 @@ public class EnemyAttackState : StateMachineBehaviour
     // OnStateExit is called when a transition ends and the state machine finishes evaluating this state
     override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        var animatorController = animator.gameObject.GetComponent<AnimatorController>();
+        var animatorController = animator.gameObject.GetComponent<EnemyAnimatorController>();
         if (animatorController != null)
         {
             animatorController.DispatchAttackAnimationFinished();
