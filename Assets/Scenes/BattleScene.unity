@@ -429,8 +429,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb908431832835c4888d8c5e8ef27d40, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _hudController: {fileID: 1507749375}
-  _camera: {fileID: 963194227}
+  hudController: {fileID: 1507749375}
+  camera: {fileID: 963194227}
 --- !u!1 &284528305
 GameObject:
   m_ObjectHideFlags: 0
@@ -1149,9 +1149,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a42568ab0752e5244bc64a4d9180775e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _cardSetController: {fileID: 1612971704}
-  _enemySpawner: {fileID: 1050641255}
-  _player: {fileID: 226234963}
+  cardSetController: {fileID: 1612971704}
+  enemySpawner: {fileID: 1050641255}
+  player: {fileID: 226234963}
 --- !u!4 &1022687850
 Transform:
   m_ObjectHideFlags: 0

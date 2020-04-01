@@ -5,21 +5,25 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "New Enemy Data", menuName = "Enemy Data")]
 public class EnemyData : ScriptableObject, ICollectionItem
 {
-    [SerializeField] private int _id = default;
-    [SerializeField] private int _health = default;
-    [SerializeField] private int _turnsToAttack = default;
-    [SerializeField] private int _attackPower = default;
-    [SerializeField] private Vector2Int _gridSize = default;
-    [SerializeField] private GameObject _model = default;
+    [SerializeField] private int id = default;
+    [SerializeField] private int health = default;
+    [SerializeField] private int turnsToAttack = default;
+    [SerializeField] private int attackPower = default;
+    [SerializeField] private Vector2Int gridSize = default;
+    [SerializeField] private GameObject model = default;
+    [SerializeField] private int scorePerHealthPoint = default;
+    [SerializeField] private int scoreRewardForDefeating = default;
 
-    public int MaxHealth => _health;
-    public int TurnsToAttack => _turnsToAttack;
-    public int AttackPower => _attackPower;
-    public Vector2Int GridSize => _gridSize;
-    public GameObject ModelPrefab => _model;
+    public int MaxHealth => health;
+    public int TurnsToAttack => turnsToAttack;
+    public int AttackPower => attackPower;
+    public Vector2Int GridSize => gridSize;
+    public GameObject ModelPrefab => model;
+    public int PointsPerHealth => scorePerHealthPoint;
+    public int RewardPoints => scoreRewardForDefeating;
 
     public int GetId()
     {
-        return _id;
+        return id;
     }
 }

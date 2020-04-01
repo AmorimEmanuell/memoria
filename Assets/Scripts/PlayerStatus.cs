@@ -6,21 +6,25 @@ using UnityEngine;
 
 public class PlayerStatus : MonoBehaviour
 {
-    [SerializeField] private PlayerHUDController _hudController = default;
-    [SerializeField] private Camera _camera = default;
+    [SerializeField] private PlayerHUDController hudController = default;
+    [SerializeField] private new Camera camera = default;
 
-    private int _currentHealth, _currentPotions;
-    private float HealthPercentage => (float)_currentHealth / Data.MaxHealth;
+    private int
+        currentHealth,
+        currentPotions,
+        currentScore;
+
+    private float HealthPercentage => (float)currentHealth / Data.MaxHealth;
 
     public PlayerSaveData Data { get; private set; }
 
     private void Awake()
     {
         Data = PlayerSaveData.Load();
-        _currentHealth = Data.MaxHealth;
-        _currentPotions = Data.MaxPotions;
+        currentHealth = Data.MaxHealth;
+        currentPotions = Data.MaxPotions;
 
-        _hudController.OnPotionButtonClicked += PotionButton_Clicked;
+        hudController.OnPotionButtonClicked += PotionButton_Clicked;
     }
 
     private void Start()
@@ -30,44 +34,50 @@ public class PlayerStatus : MonoBehaviour
 
     private void OnDestroy()
     {
-        _hudController.OnPotionButtonClicked -= PotionButton_Clicked;
+        hudController.OnPotionButtonClicked -= PotionButton_Clicked;
     }
 
     public void ResetDefaultValues()
     {
-        _hudController.SetInitialValues(this);
+        hudController.SetInitialValues(this);
     }
 
     private void PotionButton_Clicked()
     {
-        _currentPotions--;
+        currentPotions--;
 
-        _currentHealth += Data.PotionStrength;
-        _currentHealth = Mathf.Clamp(_currentHealth, 0, Data.MaxHealth);
+        currentHealth += Data.PotionStrength;
+        currentHealth = Mathf.Clamp(currentHealth, 0, Data.MaxHealth);
 
-        _hudController.UpdatePotions(_currentPotions);
-        _hudController.UpdateHealth(_currentHealth, HealthPercentage);
-        _hudController.ActivatePotionButton(ShouldActivatePotionButton());
+        hudController.UpdatePotions(currentPotions);
+        hudController.UpdateHealth(currentHealth, HealthPercentage);
+        hudController.ActivatePotionButton(ShouldActivatePotionButton());
     }
 
     private bool ShouldActivatePotionButton()
     {
         return
-            _currentHealth > 0 &&
-            _currentHealth < Data.MaxHealth &&
-            _currentPotions > 0;
+            currentHealth > 0 &&
+            currentHealth < Data.MaxHealth &&
+            currentPotions > 0;
     }
 
     public bool ApplyDamage(int damageReceived)
     {
-        _currentHealth -= damageReceived;
-        _currentHealth = Mathf.Clamp(_currentHealth, 0, Data.MaxHealth);
+        currentHealth -= damageReceived;
+        currentHealth = Mathf.Clamp(currentHealth, 0, Data.MaxHealth);
 
-        _hudController.UpdateHealth(_currentHealth, HealthPercentage);
-        _hudController.ActivatePotionButton(ShouldActivatePotionButton());
+        hudController.UpdateHealth(currentHealth, HealthPercentage);
+        hudController.ActivatePotionButton(ShouldActivatePotionButton());
 
-        _camera.DOShakePosition(.2f, .05f);
+        camera.DOShakePosition(.2f, .05f);
 
-        return _currentHealth > 0;
+        return currentHealth > 0;
+    }
+
+    public void AddToScore(int score)
+    {
+        currentScore += score;
+        hudController.UpdateScore(currentScore);
     }
 }

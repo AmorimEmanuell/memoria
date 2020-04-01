@@ -189,8 +189,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e45596f2c0c60e4ab1a83823fd2ac76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _modelContainer: {fileID: 4507493392461316684}
-  _hudController: {fileID: 380953977306662043}
+  modelContainer: {fileID: 4507493392461316684}
+  hudController: {fileID: 380953977306662043}
 --- !u!1 &4507493392066994179
 GameObject:
   m_ObjectHideFlags: 0

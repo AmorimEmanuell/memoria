@@ -12,9 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c380cb61d5dc6e4db7d71c0d23d22e8, type: 3}
   m_Name: 2-Slime_Heavy
   m_EditorClassIdentifier: 
-  _id: 2
-  _health: 4
-  _turnsToAttack: 3
-  _attackPower: 2
-  _gridSize: {x: 2, y: 4}
-  _model: {fileID: 1090219386143568, guid: a817c29ea6847604bb2c6c51d9a74bf1, type: 3}
+  id: 2
+  health: 4
+  turnsToAttack: 3
+  attackPower: 2
+  gridSize: {x: 2, y: 3}
+  model: {fileID: 1090219386143568, guid: a817c29ea6847604bb2c6c51d9a74bf1, type: 3}
+  scorePerHealthPoint: 3
+  scoreRewardForDefeating: 13
