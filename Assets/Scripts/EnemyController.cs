@@ -8,27 +8,28 @@ using UnityEngine.UI;
 
 public class EnemyController : MonoBehaviour
 {
-    [SerializeField] private Transform _modelContainer = default;
-    [SerializeField] private EnemyHUDController _hudController = default;
+    [SerializeField] private Transform modelContainer = default;
+    [SerializeField] private EnemyHUDController hudController = default;
 
     private const string
         GetHitTrigger = "GetHit",
         RemainingTurnsToAttackInt = "RemainingTurnsToAttack",
         HealthInt = "Health";
 
-    private EnemyAnimatorController _animator;
-    private int _currentHealth, _remainingTurnsToAttack;
-    private float HealthPercentage => (float)_currentHealth / Data.MaxHealth;
+    private EnemyAnimatorController animator;
+    private int currentHealth, remainingTurnsToAttack;
+    private float HealthPercentage => (float)currentHealth / Data.MaxHealth;
 
     public Action<int> OnAttackAnimationFinished;
     public Action<bool> OnDamageAnimationFinished;
 
     public EnemyData Data { get; private set; }
+    public bool IsAlive => currentHealth > 0;
 
     private void OnDestroy()
     {
-        _animator.OnDamageAnimationFinished -= FinishDamageAnimation;
-        _animator.OnAttackAnimationFinished -= FinishAttackAnimation;
+        animator.OnDamageAnimationFinished -= FinishDamageAnimation;
+        animator.OnAttackAnimationFinished -= FinishAttackAnimation;
     }
 
     public void SetData(EnemyData data)
@@ -40,49 +41,48 @@ public class EnemyController : MonoBehaviour
 
     private void LoadModelInContainer(GameObject modelPrefab)
     {
-        var model = Instantiate(modelPrefab, _modelContainer);
+        var model = Instantiate(modelPrefab, modelContainer);
 
-        _animator = model.AddComponent<EnemyAnimatorController>();
-        _animator.OnDamageAnimationFinished += FinishDamageAnimation;
-        _animator.OnAttackAnimationFinished += FinishAttackAnimation;
+        animator = model.AddComponent<EnemyAnimatorController>();
+        animator.OnDamageAnimationFinished += FinishDamageAnimation;
+        animator.OnAttackAnimationFinished += FinishAttackAnimation;
     }
 
     public void ResetDefaultProperties()
     {
-        _currentHealth = Data.MaxHealth;
-        _hudController.SetInitialValues(Data.MaxHealth);
+        currentHealth = Data.MaxHealth;
+        hudController.SetInitialValues(Data.MaxHealth);
 
         ResetRemainingTurnsToAttack();
     }
 
-    public bool ApplyDamage(int damageReceived)
+    public void ApplyDamage(int damageReceived, out int reducedHealth)
     {
-        _currentHealth -= damageReceived;
-        _currentHealth = Mathf.Clamp(_currentHealth, 0, Data.MaxHealth);
+        currentHealth -= damageReceived;
+        reducedHealth = IsAlive ? damageReceived : damageReceived + currentHealth;
+        currentHealth = Mathf.Clamp(currentHealth, 0, Data.MaxHealth);
 
-        _animator.SetInteger(HealthInt, _currentHealth);
-        _animator.SetTrigger(GetHitTrigger);
+        animator.SetInteger(HealthInt, currentHealth);
+        animator.SetTrigger(GetHitTrigger);
 
-        _hudController.UpdateHealth(_currentHealth, HealthPercentage);
-
-        return _currentHealth > 0;
+        hudController.UpdateHealth(currentHealth, HealthPercentage);
     }
 
     public void CheckIfShouldAttack()
     {
-        _remainingTurnsToAttack--;
-        _animator.SetInteger(RemainingTurnsToAttackInt, _remainingTurnsToAttack);
+        remainingTurnsToAttack--;
+        animator.SetInteger(RemainingTurnsToAttackInt, remainingTurnsToAttack);
     }
 
     private void ResetRemainingTurnsToAttack()
     {
-        _remainingTurnsToAttack = Data.TurnsToAttack;
-        _animator.SetInteger(RemainingTurnsToAttackInt, Data.TurnsToAttack);
+        remainingTurnsToAttack = Data.TurnsToAttack;
+        animator.SetInteger(RemainingTurnsToAttackInt, Data.TurnsToAttack);
     }
 
     private void FinishDamageAnimation()
     {
-        OnDamageAnimationFinished?.Invoke(_currentHealth > 0);
+        OnDamageAnimationFinished?.Invoke(currentHealth > 0);
     }
 
     private void FinishAttackAnimation()

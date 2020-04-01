@@ -5,16 +5,16 @@ using UnityEngine;
 
 public class BattleManager : MonoBehaviour
 {
-    [SerializeField] private CardSetController _cardSetController = default;
-    [SerializeField] private EnemySpawner _enemySpawner = default;
-    [SerializeField] private PlayerStatus _player = default;
+    [SerializeField] private CardSetController cardSetController = default;
+    [SerializeField] private EnemySpawner enemySpawner = default;
+    [SerializeField] private PlayerStatus player = default;
 
-    private EnemyController _currentEnemy;
+    private EnemyController currentEnemy;
 
     private void Awake()
     {
-        _cardSetController.OnPairFound += CardSet_OnPairFound;
-        _cardSetController.OnPairMiss += CardSet_OnPairMiss;
+        cardSetController.OnPairFound += CardSet_OnPairFound;
+        cardSetController.OnPairMiss += CardSet_OnPairMiss;
 
         Events.instance.AddListener<RestartEvent>(OnGameRestart);
     }
@@ -26,41 +26,47 @@ public class BattleManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        _cardSetController.OnPairFound -= CardSet_OnPairFound;
-        _cardSetController.OnPairMiss -= CardSet_OnPairMiss;
+        cardSetController.OnPairFound -= CardSet_OnPairFound;
+        cardSetController.OnPairMiss -= CardSet_OnPairMiss;
 
         Events.instance.RemoveListener<RestartEvent>(OnGameRestart);
     }
 
     private void PrepareNextEnemy()
     {
-        if (_currentEnemy != null)
+        if (currentEnemy != null)
         {
-            _currentEnemy.OnAttackAnimationFinished -= OnEnemyAttack;
-            _currentEnemy.OnDamageAnimationFinished -= UpdateBattleStatus;
-            _currentEnemy.gameObject.SetActive(false);
+            currentEnemy.OnAttackAnimationFinished -= OnEnemyAttack;
+            currentEnemy.OnDamageAnimationFinished -= UpdateBattleStatus;
+            currentEnemy.gameObject.SetActive(false);
         }
 
-        _currentEnemy = _enemySpawner.SpawnNewEnemy();
-        _currentEnemy.OnAttackAnimationFinished += OnEnemyAttack;
-        _currentEnemy.OnDamageAnimationFinished += UpdateBattleStatus;
+        currentEnemy = enemySpawner.SpawnNewEnemy();
+        currentEnemy.OnAttackAnimationFinished += OnEnemyAttack;
+        currentEnemy.OnDamageAnimationFinished += UpdateBattleStatus;
 
         CreateNewGameSet();
     }
 
     private void CreateNewGameSet()
     {
-        var enemyGrid = _currentEnemy.Data.GridSize;
-        _cardSetController.SetupNewGame(enemyGrid.x, enemyGrid.y);
+        var enemyGrid = currentEnemy.Data.GridSize;
+        cardSetController.SetupNewGame(enemyGrid.x, enemyGrid.y);
     }
 
     private void CardSet_OnPairFound()
     {
-        var isEnemyAlive = _currentEnemy.ApplyDamage(1);
+        var playerAttackPower = player.Data.AttackPower;
+        currentEnemy.ApplyDamage(playerAttackPower, out int reducedHealth);
 
-        if (!isEnemyAlive)
+        if (currentEnemy.IsAlive)
         {
-            _cardSetController.SetCardsInteractable(false);
+            var score = currentEnemy.Data.PointsPerHealth * reducedHealth;
+            player.AddToScore(score);
+        }
+        else
+        {
+            cardSetController.SetCardsInteractable(false);
         }
     }
 
@@ -68,29 +74,30 @@ public class BattleManager : MonoBehaviour
     {
         if (isEnemyAlive)
         {
-            if (_cardSetController.RemainingPairs == 0)
+            if (cardSetController.RemainingPairs == 0)
             {
                 CreateNewGameSet();
             }
         }
         else
         {
+            player.AddToScore(currentEnemy.Data.RewardPoints);
             PrepareNextEnemy();
         }
     }
 
     private void CardSet_OnPairMiss()
     {
-        _currentEnemy.CheckIfShouldAttack();
+        currentEnemy.CheckIfShouldAttack();
     }
 
     private void OnEnemyAttack(int atkPower)
     {
-        var isPlayerAlive = _player.ApplyDamage(atkPower);
+        var isPlayerAlive = player.ApplyDamage(atkPower);
 
         if (!isPlayerAlive)
         {
-            _cardSetController.SetCardsInteractable(false);
+            cardSetController.SetCardsInteractable(false);
 
             Events.instance.Raise(new PlayerDefeatEvent());
         }
@@ -98,7 +105,7 @@ public class BattleManager : MonoBehaviour
 
     private void OnGameRestart(RestartEvent e)
     {
-        _player.ResetDefaultValues();
+        player.ResetDefaultValues();
         PrepareNextEnemy();
     }
 }

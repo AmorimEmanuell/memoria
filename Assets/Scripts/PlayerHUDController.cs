@@ -56,4 +56,9 @@ public class PlayerHUDController : MonoBehaviour
     {
         _potionBtn.interactable = active;
     }
+
+    public void UpdateScore(int currentScore)
+    {
+        Debug.Log("Score: " + currentScore);
+    }
 }

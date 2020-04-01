@@ -12,9 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c380cb61d5dc6e4db7d71c0d23d22e8, type: 3}
   m_Name: 5-Turtle_Heavy
   m_EditorClassIdentifier: 
-  _id: 5
-  _health: 6
-  _turnsToAttack: 3
-  _attackPower: 3
-  _gridSize: {x: 4, y: 3}
-  _model: {fileID: 1837317425425208, guid: 3aec22b5d3f3c2947bb81040b56e5f96, type: 3}
+  id: 5
+  health: 6
+  turnsToAttack: 3
+  attackPower: 3
+  gridSize: {x: 3, y: 2}
+  model: {fileID: 1837317425425208, guid: 3aec22b5d3f3c2947bb81040b56e5f96, type: 3}
+  scorePerHealthPoint: 5
+  scoreRewardForDefeating: 31
