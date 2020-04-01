@@ -8,11 +8,11 @@ using TMPro;
 
 public class PlayerHUDController : MonoBehaviour
 {
-    [SerializeField] private Button _potionBtn = default;
-    [SerializeField] private TextMeshProUGUI _potionCount = default;
-    [SerializeField] private Slider _healthSlider = default;
-    [SerializeField] private Image _healthFill = default;
-    [SerializeField] private Gradient _healthColorGradient = default;
+    [SerializeField] private Button potionBtn = default;
+    [SerializeField] private TextMeshProUGUI potionCount = default;
+    [SerializeField] private Slider healthSlider = default;
+    [SerializeField] private Image healthFill = default;
+    [SerializeField] private Gradient healthColorGradient = default;
 
     private const float AnimationTime = 0.5f;
 
@@ -20,45 +20,48 @@ public class PlayerHUDController : MonoBehaviour
 
     private void Awake()
     {
-        _potionBtn.onClick.AddListener(() => OnPotionButtonClicked?.Invoke());
+        potionBtn.onClick.AddListener(() => OnPotionButtonClicked?.Invoke());
     }
 
     private void OnDestroy()
     {
-        _potionBtn.onClick.RemoveAllListeners();
+        potionBtn.onClick.RemoveAllListeners();
     }
 
-    public void SetInitialValues(PlayerStatus player)
+    public void SetInitialValues(PlayerSaveData playerData)
     {
-        _healthSlider.maxValue = player.Data.MaxHealth;
-        _healthSlider.value = player.Data.MaxHealth;
+        healthSlider.maxValue = playerData.MaxHealth;
+        healthSlider.value = playerData.MaxHealth;
 
-        _healthFill.color = _healthColorGradient.Evaluate(1);
+        healthFill.color = healthColorGradient.Evaluate(1);
 
-        _potionCount.text = player.Data.MaxPotions.ToString();
-        _potionBtn.interactable = false;
+        potionCount.text = playerData.MaxPotions.ToString();
+        potionBtn.interactable = false;
+
+        //TODO: Reset Score text count
     }
 
     public void UpdateHealth(int currentHealth, float healthPercentage)
     {
-        _healthSlider.DOValue(currentHealth, AnimationTime);
+        healthSlider.DOValue(currentHealth, AnimationTime);
 
-        var healthColor = _healthColorGradient.Evaluate(healthPercentage);
-        _healthFill.DOColor(healthColor, AnimationTime);
+        var healthColor = healthColorGradient.Evaluate(healthPercentage);
+        healthFill.DOColor(healthColor, AnimationTime);
     }
 
     public void UpdatePotions(int currentPotions)
     {
-        _potionCount.text = currentPotions.ToString();
+        potionCount.text = currentPotions.ToString();
     }
 
     public void ActivatePotionButton(bool active)
     {
-        _potionBtn.interactable = active;
+        potionBtn.interactable = active;
     }
 
     public void UpdateScore(int currentScore)
     {
         Debug.Log("Score: " + currentScore);
+        //TODO:Create score text count
     }
 }
