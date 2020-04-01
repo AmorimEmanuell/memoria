@@ -1930,11 +1930,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 225dfbee1263e2f459590a010b873b6e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _potionBtn: {fileID: 1011824284}
-  _potionCount: {fileID: 221285989}
-  _healthSlider: {fileID: 1184573724}
-  _healthFill: {fileID: 1382928277}
-  _healthColorGradient:
+  potionBtn: {fileID: 1011824284}
+  potionCount: {fileID: 221285989}
+  healthSlider: {fileID: 1184573724}
+  healthFill: {fileID: 1382928277}
+  healthColorGradient:
     serializedVersion: 2
     key0: {r: 0.98039216, g: 0.13725491, b: 0, a: 0.8784314}
     key1: {r: 0.8941782, g: 0.9528302, b: 0.16629584, a: 0.8784314}

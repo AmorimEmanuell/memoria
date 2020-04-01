@@ -21,8 +21,6 @@ public class PlayerStatus : MonoBehaviour
     private void Awake()
     {
         Data = PlayerSaveData.Load();
-        currentHealth = Data.MaxHealth;
-        currentPotions = Data.MaxPotions;
 
         hudController.OnPotionButtonClicked += PotionButton_Clicked;
     }
@@ -39,7 +37,11 @@ public class PlayerStatus : MonoBehaviour
 
     public void ResetDefaultValues()
     {
-        hudController.SetInitialValues(this);
+        currentHealth = Data.MaxHealth;
+        currentPotions = Data.MaxPotions;
+        currentScore = 0;
+
+        hudController.SetInitialValues(Data);
     }
 
     private void PotionButton_Clicked()
