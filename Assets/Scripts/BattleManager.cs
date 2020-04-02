@@ -62,7 +62,7 @@ public class BattleManager : MonoBehaviour
         if (currentEnemy.IsAlive)
         {
             var score = currentEnemy.Data.PointsPerHealth * reducedHealth;
-            player.AddToScore(score);
+            player.IncreaseScore(score);
         }
         else
         {
@@ -81,7 +81,7 @@ public class BattleManager : MonoBehaviour
         }
         else
         {
-            player.AddToScore(currentEnemy.Data.RewardPoints);
+            player.IncreaseScore(currentEnemy.Data.RewardPoints);
             PrepareNextEnemy();
         }
     }
@@ -98,7 +98,6 @@ public class BattleManager : MonoBehaviour
         if (!isPlayerAlive)
         {
             cardSetController.SetCardsInteractable(false);
-
             Events.instance.Raise(new PlayerDefeatEvent());
         }
     }
