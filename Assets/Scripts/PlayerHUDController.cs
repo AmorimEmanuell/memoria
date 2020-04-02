@@ -13,14 +13,19 @@ public class PlayerHUDController : MonoBehaviour
     [SerializeField] private Slider healthSlider = default;
     [SerializeField] private Image healthFill = default;
     [SerializeField] private Gradient healthColorGradient = default;
+    [SerializeField] private TextMeshProUGUI displayedScore = default;
 
     private const float AnimationTime = 0.5f;
+
+    private RectTransform displayedScoreRect;
+    private Coroutine updateScoreTextAnimation;
 
     public Action OnPotionButtonClicked;
 
     private void Awake()
     {
         potionBtn.onClick.AddListener(() => OnPotionButtonClicked?.Invoke());
+        displayedScoreRect = displayedScore.rectTransform;
     }
 
     private void OnDestroy()
@@ -38,7 +43,7 @@ public class PlayerHUDController : MonoBehaviour
         potionCount.text = playerData.MaxPotions.ToString();
         potionBtn.interactable = false;
 
-        //TODO: Reset Score text count
+        displayedScore.text = "0";
     }
 
     public void UpdateHealth(int currentHealth, float healthPercentage)
@@ -61,7 +66,34 @@ public class PlayerHUDController : MonoBehaviour
 
     public void UpdateScore(int currentScore)
     {
-        Debug.Log("Score: " + currentScore);
-        //TODO:Create score text count
+        displayedScoreRect.DOScale(1.5f, AnimationTime).OnComplete(() =>
+        {
+            displayedScoreRect.DOScale(1f, AnimationTime);
+        });
+
+        if (updateScoreTextAnimation != null)
+        {
+            StopCoroutine(updateScoreTextAnimation);
+        }
+
+        updateScoreTextAnimation = StartCoroutine(UpdateScoreAnimation(currentScore));
+    }
+
+    private IEnumerator UpdateScoreAnimation(int nextDisplayedScore)
+    {
+        var progress = 0f;
+        var elapsedTime = 0f;
+        var currentDisplayedScore = int.Parse(displayedScore.text);
+
+        while (progress < 1)
+        {
+            elapsedTime += Time.deltaTime;
+            progress = Mathf.Clamp01(elapsedTime / AnimationTime);
+
+            var displayScore = (int)Mathf.Lerp(currentDisplayedScore, nextDisplayedScore, progress);
+            displayedScore.text = displayScore.ToString();
+
+            yield return null;
+        }
     }
 }

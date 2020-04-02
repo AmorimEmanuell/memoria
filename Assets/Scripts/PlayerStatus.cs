@@ -77,9 +77,9 @@ public class PlayerStatus : MonoBehaviour
         return currentHealth > 0;
     }
 
-    public void AddToScore(int score)
+    public void IncreaseScore(int scoreGained)
     {
-        currentScore += score;
+        currentScore += scoreGained;
         hudController.UpdateScore(currentScore);
     }
 }
