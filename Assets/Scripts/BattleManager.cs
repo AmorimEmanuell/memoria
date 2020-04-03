@@ -36,14 +36,14 @@ public class BattleManager : MonoBehaviour
     {
         if (currentEnemy != null)
         {
-            currentEnemy.OnAttackAnimationFinished -= Enemy_OnAttackAnimationFinished;
-            currentEnemy.OnDamageAnimationFinished -= Enemy_OnDamageAnimationFinished;
+            currentEnemy.OnAtkAnimationComplete -= Enemy_OnAtkAnimationComplete;
+            currentEnemy.OnDmgAnimationComplete -= Enemy_OnDmgAnimationComplete;
             currentEnemy.gameObject.SetActive(false);
         }
 
         currentEnemy = enemySpawner.SpawnNewEnemy();
-        currentEnemy.OnAttackAnimationFinished += Enemy_OnAttackAnimationFinished;
-        currentEnemy.OnDamageAnimationFinished += Enemy_OnDamageAnimationFinished;
+        currentEnemy.OnAtkAnimationComplete += Enemy_OnAtkAnimationComplete;
+        currentEnemy.OnDmgAnimationComplete += Enemy_OnDmgAnimationComplete;
 
         CreateNewGameSet();
     }
@@ -75,7 +75,7 @@ public class BattleManager : MonoBehaviour
         currentEnemy.CheckIfShouldAttack();
     }
 
-    private void Enemy_OnDamageAnimationFinished(bool isEnemyAlive)
+    private void Enemy_OnDmgAnimationComplete(bool isEnemyAlive)
     {
         if (isEnemyAlive)
         {
@@ -90,7 +90,7 @@ public class BattleManager : MonoBehaviour
         }
     }
 
-    private void Enemy_OnAttackAnimationFinished(int atkPower)
+    private void Enemy_OnAtkAnimationComplete(int atkPower)
     {
         var isPlayerAlive = player.ApplyDamage(atkPower);
 

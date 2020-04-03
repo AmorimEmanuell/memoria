@@ -20,16 +20,16 @@ public class EnemyController : MonoBehaviour
     private int currentHealth, remainingTurnsToAttack;
     private float HealthPercentage => (float)currentHealth / Data.MaxHealth;
 
-    public Action<int> OnAttackAnimationFinished;
-    public Action<bool> OnDamageAnimationFinished;
+    public Action<int> OnAtkAnimationComplete;
+    public Action<bool> OnDmgAnimationComplete;
 
     public EnemyData Data { get; private set; }
     public bool IsAlive => currentHealth > 0;
 
     private void OnDestroy()
     {
-        animator.OnDamageAnimationFinished -= FinishDamageAnimation;
-        animator.OnAttackAnimationFinished -= FinishAttackAnimation;
+        animator.OnDmgAnimationComplete -= Animator_OnDmgAnimationComplete;
+        animator.OnAtkAnimationComplete -= Animator_OnAtkAnimationComplete;
     }
 
     public void SetData(EnemyData data)
@@ -44,8 +44,8 @@ public class EnemyController : MonoBehaviour
         var model = Instantiate(modelPrefab, modelContainer);
 
         animator = model.AddComponent<EnemyAnimatorController>();
-        animator.OnDamageAnimationFinished += FinishDamageAnimation;
-        animator.OnAttackAnimationFinished += FinishAttackAnimation;
+        animator.OnDmgAnimationComplete += Animator_OnDmgAnimationComplete;
+        animator.OnAtkAnimationComplete += Animator_OnAtkAnimationComplete;
     }
 
     public void ResetDefaultProperties()
@@ -53,7 +53,7 @@ public class EnemyController : MonoBehaviour
         currentHealth = Data.MaxHealth;
         hudController.SetInitialValues(Data.MaxHealth);
 
-        ResetRemainingTurnsToAttack();
+        UpdateRemainingTurnsToAttack(Data.TurnsToAttack);
     }
 
     public void ApplyDamage(int damageReceived, out int reducedHealth)
@@ -66,28 +66,30 @@ public class EnemyController : MonoBehaviour
         animator.SetTrigger(GetHitTrigger);
 
         hudController.UpdateHealth(currentHealth, HealthPercentage);
+
+        UpdateRemainingTurnsToAttack(remainingTurnsToAttack + 1);
     }
 
     public void CheckIfShouldAttack()
     {
-        remainingTurnsToAttack--;
+        UpdateRemainingTurnsToAttack(remainingTurnsToAttack - 1);
+    }
+
+    private void UpdateRemainingTurnsToAttack(int turnsToAttack)
+    {
+        remainingTurnsToAttack = turnsToAttack;
+        remainingTurnsToAttack = Mathf.Clamp(remainingTurnsToAttack, 0, Data.TurnsToAttack);
         animator.SetInteger(RemainingTurnsToAttackInt, remainingTurnsToAttack);
     }
 
-    private void ResetRemainingTurnsToAttack()
+    private void Animator_OnDmgAnimationComplete()
     {
-        remainingTurnsToAttack = Data.TurnsToAttack;
-        animator.SetInteger(RemainingTurnsToAttackInt, Data.TurnsToAttack);
+        OnDmgAnimationComplete?.Invoke(currentHealth > 0);
     }
 
-    private void FinishDamageAnimation()
+    private void Animator_OnAtkAnimationComplete()
     {
-        OnDamageAnimationFinished?.Invoke(currentHealth > 0);
-    }
-
-    private void FinishAttackAnimation()
-    {
-        ResetRemainingTurnsToAttack();
-        OnAttackAnimationFinished?.Invoke(Data.AttackPower);
+        UpdateRemainingTurnsToAttack(Data.TurnsToAttack);
+        OnAtkAnimationComplete?.Invoke(Data.AttackPower);
     }
 }

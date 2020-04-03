@@ -6,7 +6,7 @@ using UnityEngine;
 [RequireComponent(typeof(Animator))]
 public class EnemyAnimatorController : MonoBehaviour
 {
-    public Action OnDamageAnimationFinished, OnAttackAnimationFinished;
+    public Action OnDmgAnimationComplete, OnAtkAnimationComplete;
 
     private Animator _animator;
 
@@ -27,11 +27,11 @@ public class EnemyAnimatorController : MonoBehaviour
 
     public void DispatchDamageAnimationFinishedEvent()
     {
-        OnDamageAnimationFinished?.Invoke();
+        OnDmgAnimationComplete?.Invoke();
     }
 
     public void DispatchAttackAnimationFinished()
     {
-        OnAttackAnimationFinished?.Invoke();
+        OnAtkAnimationComplete?.Invoke();
     }
 }
