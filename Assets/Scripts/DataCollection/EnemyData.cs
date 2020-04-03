@@ -12,7 +12,6 @@ public class EnemyData : ScriptableObject, ICollectionItem
     [SerializeField] private Vector2Int gridSize = default;
     [SerializeField] private GameObject model = default;
     [SerializeField] private int scorePerHealthPoint = default;
-    [SerializeField] private int scoreRewardForDefeating = default;
 
     public int MaxHealth => health;
     public int TurnsToAttack => turnsToAttack;
@@ -20,7 +19,6 @@ public class EnemyData : ScriptableObject, ICollectionItem
     public Vector2Int GridSize => gridSize;
     public GameObject ModelPrefab => model;
     public int PointsPerHealth => scorePerHealthPoint;
-    public int RewardPoints => scoreRewardForDefeating;
 
     public int GetId()
     {
