@@ -28,7 +28,11 @@ public class EnemySpawner : MonoBehaviour
             return null;
         }
 
+#if D
+        var pickId = 0;
+#else
         var pickId = UnityEngine.Random.Range(0, data.Length);
+#endif
         return data[pickId];
     }
 
