@@ -13,10 +13,9 @@ MonoBehaviour:
   m_Name: 0-Slime
   m_EditorClassIdentifier: 
   id: 0
-  health: 3
+  health: 2
   turnsToAttack: 3
   attackPower: 1
   gridSize: {x: 2, y: 2}
   model: {fileID: 1090219386143568, guid: a817c29ea6847604bb2c6c51d9a74bf1, type: 3}
   scorePerHealthPoint: 1
-  scoreRewardForDefeating: 4
