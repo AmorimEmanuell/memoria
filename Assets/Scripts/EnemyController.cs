@@ -18,10 +18,11 @@ public class EnemyController : MonoBehaviour
 
     private EnemyAnimatorController animator;
     private int currentHealth, remainingTurnsToAttack;
+
     private float HealthPercentage => (float)currentHealth / Data.MaxHealth;
 
     public Action<int> OnAtkAnimationComplete;
-    public Action<bool> OnDmgAnimationComplete;
+    public Action OnDmgAnimationComplete;
 
     public EnemyData Data { get; private set; }
     public bool IsAlive => currentHealth > 0;
@@ -84,7 +85,7 @@ public class EnemyController : MonoBehaviour
 
     private void Animator_OnDmgAnimationComplete()
     {
-        OnDmgAnimationComplete?.Invoke(currentHealth > 0);
+        OnDmgAnimationComplete?.Invoke();
     }
 
     private void Animator_OnAtkAnimationComplete()
