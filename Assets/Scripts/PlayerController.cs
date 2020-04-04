@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerStatus : MonoBehaviour
+public class PlayerController : MonoBehaviour
 {
     [SerializeField] private PlayerHUDController hudController = default;
     [SerializeField] private new Camera camera = default;
@@ -17,6 +17,7 @@ public class PlayerStatus : MonoBehaviour
     private float HealthPercentage => (float)currentHealth / Data.MaxHealth;
 
     public PlayerSaveData Data { get; private set; }
+    public bool IsAlive => currentHealth > 0;
 
     private void Awake()
     {
@@ -59,12 +60,12 @@ public class PlayerStatus : MonoBehaviour
     private bool ShouldActivatePotionButton()
     {
         return
-            currentHealth > 0 &&
+            IsAlive &&
             currentHealth < Data.MaxHealth &&
             currentPotions > 0;
     }
 
-    public bool ApplyDamage(int damageReceived)
+    public void ApplyDamage(int damageReceived)
     {
         currentHealth -= damageReceived;
         currentHealth = Mathf.Clamp(currentHealth, 0, Data.MaxHealth);
@@ -73,8 +74,6 @@ public class PlayerStatus : MonoBehaviour
         hudController.ActivatePotionButton(ShouldActivatePotionButton());
 
         camera.DOShakePosition(.2f, .05f);
-
-        return currentHealth > 0;
     }
 
     public void IncreaseScore(int scoreGained)
