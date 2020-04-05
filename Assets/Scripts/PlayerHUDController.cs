@@ -53,7 +53,7 @@ public class PlayerHUDController : MonoBehaviour
         healthFill.DOColor(healthColor, AnimationTime);
     }
 
-    public void UpdatePotions(int currentPotions)
+    public void UpdatePotionCount(int currentPotions)
     {
         potionCount.text = currentPotions.ToString();
     }

@@ -37,7 +37,7 @@ public class PotionSpawner : MonoBehaviour
         potions.Add(potion);
         activePotions--;
 
-        //TODO: Notify player
+        Events.instance.Raise(new PotionPickedEvent());
     }
 
     public void Spawn(Vector3 location)
