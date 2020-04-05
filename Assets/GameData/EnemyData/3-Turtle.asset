@@ -13,10 +13,9 @@ MonoBehaviour:
   m_Name: 3-Turtle
   m_EditorClassIdentifier: 
   id: 3
-  health: 4
+  health: 3
   turnsToAttack: 3
   attackPower: 2
-  gridSize: {x: 2, y: 4}
+  gridSize: {x: 2, y: 3}
   model: {fileID: 1837317425425208, guid: 3aec22b5d3f3c2947bb81040b56e5f96, type: 3}
   scorePerHealthPoint: 3
-  scoreRewardForDefeating: 13
