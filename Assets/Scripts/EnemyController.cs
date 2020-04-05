@@ -16,6 +16,7 @@ public class EnemyController : MonoBehaviour
         RemainingTurnsToAttackInt = "RemainingTurnsToAttack",
         HealthInt = "Health";
 
+
     private EnemyAnimatorController animator;
     private int currentHealth, remainingTurnsToAttack;
 
@@ -26,6 +27,7 @@ public class EnemyController : MonoBehaviour
 
     public EnemyData Data { get; private set; }
     public bool IsAlive => currentHealth > 0;
+    public Vector3 ModelPosition => modelContainer.transform.position;
 
     private void OnDestroy()
     {

@@ -8,6 +8,13 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private CardSetController cardSetController = default;
     [SerializeField] private EnemySpawner enemySpawner = default;
     [SerializeField] private PlayerController player = default;
+    [SerializeField] private PotionSpawner potionSpawner = default;
+
+#if D
+    private const float PotionDroppingChance = 1f;
+#else
+    private const float PotionDroppingChance = 0.1f;
+#endif
 
     private EnemyController currentEnemy;
 
@@ -61,12 +68,9 @@ public class BattleManager : MonoBehaviour
     private void Player_OnActionSucceded()
     {
         currentEnemy.ApplyDamage(player.Data.AttackPower, out int reducedHealth);
+        player.IncreaseScore(currentEnemy.Data.PointsPerHealth * reducedHealth);
 
-        if (currentEnemy.IsAlive)
-        {
-            player.IncreaseScore(currentEnemy.Data.PointsPerHealth * reducedHealth);
-        }
-        else
+        if (!currentEnemy.IsAlive)
         {
             cardSetController.SetCardsInteractable(false);
         }
@@ -88,7 +92,16 @@ public class BattleManager : MonoBehaviour
         }
         else
         {
+            CalculatePotionDroppingChance();
             AdvanceToNextRound();
+        }
+    }
+
+    private void CalculatePotionDroppingChance()
+    {
+        if (UnityEngine.Random.value <= PotionDroppingChance)
+        {
+            potionSpawner.Spawn(currentEnemy.ModelPosition);
         }
     }
 
