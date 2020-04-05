@@ -1,9 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class EnemyGetHitState : StateMachineBehaviour
 {
+    private EnemyAnimatorController enemyAnimatorController;
+
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
     //override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     //{
@@ -19,11 +19,12 @@ public class EnemyGetHitState : StateMachineBehaviour
     // OnStateExit is called when a transition ends and the state machine finishes evaluating this state
     override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        var animatorController = animator.gameObject.GetComponent<EnemyAnimatorController>();
-        if (animatorController != null)
+        if (!enemyAnimatorController)
         {
-            animatorController.DispatchDamageAnimationFinishedEvent();
+            enemyAnimatorController = animator.gameObject.GetComponent<EnemyAnimatorController>();
         }
+
+        enemyAnimatorController.DispatchDmgAnimationCompleteEvent();
     }
 
     // OnStateMove is called right after Animator.OnAnimatorMove()

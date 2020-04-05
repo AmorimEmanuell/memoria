@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Animator))]
@@ -25,7 +23,7 @@ public class EnemyAnimatorController : MonoBehaviour
         _animator.SetTrigger(key);
     }
 
-    public void DispatchDamageAnimationFinishedEvent()
+    public void DispatchDmgAnimationCompleteEvent()
     {
         OnDmgAnimationComplete?.Invoke();
     }
