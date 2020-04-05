@@ -1,4 +1,5 @@
 ﻿using DG.Tweening;
+using System;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -21,6 +22,7 @@ public class PlayerController : MonoBehaviour
         Data = PlayerSaveData.Load();
 
         hudController.OnPotionButtonClicked += PotionButton_Clicked;
+        Events.instance.AddListener<PotionPickedEvent>(OnPotionPickedup);
     }
 
     private void Start()
@@ -31,6 +33,7 @@ public class PlayerController : MonoBehaviour
     private void OnDestroy()
     {
         hudController.OnPotionButtonClicked -= PotionButton_Clicked;
+        Events.instance.RemoveListener<PotionPickedEvent>(OnPotionPickedup);
     }
 
     public void ResetDefaultValues()
@@ -44,13 +47,9 @@ public class PlayerController : MonoBehaviour
 
     private void PotionButton_Clicked()
     {
-        currentPotions--;
+        AddPotions(-1);
+        AddHealth(Data.PotionStrength);
 
-        currentHealth += Data.PotionStrength;
-        currentHealth = Mathf.Clamp(currentHealth, 0, Data.MaxHealth);
-
-        hudController.UpdatePotions(currentPotions);
-        hudController.UpdateHealth(currentHealth, HealthPercentage);
         hudController.ActivatePotionButton(ShouldActivatePotionButton());
     }
 
@@ -64,18 +63,51 @@ public class PlayerController : MonoBehaviour
 
     public void ApplyDamage(int damageReceived)
     {
-        currentHealth -= damageReceived;
-        currentHealth = Mathf.Clamp(currentHealth, 0, Data.MaxHealth);
+        AddHealth(-damageReceived);
 
-        hudController.UpdateHealth(currentHealth, HealthPercentage);
         hudController.ActivatePotionButton(ShouldActivatePotionButton());
 
         camera.DOShakePosition(.2f, .05f);
     }
 
-    public void IncreaseScore(int scoreGained)
+    private void OnPotionPickedup(PotionPickedEvent e)
+    {
+        if (currentPotions < Data.MaxPotions)
+        {
+            AddPotions(1);
+        }
+        else
+        {
+            if (currentHealth < Data.MaxHealth)
+            {
+                AddHealth(Data.PotionStrength);
+            }
+            else
+            {
+                AddScore(Data.PotionStrength);
+            }
+        }
+
+        hudController.ActivatePotionButton(ShouldActivatePotionButton());
+    }
+
+    public void AddScore(int scoreGained)
     {
         currentScore += scoreGained;
         hudController.UpdateScore(currentScore);
+    }
+
+    private void AddHealth(int healthGained)
+    {
+        currentHealth += healthGained;
+        currentHealth = Mathf.Clamp(currentHealth, 0, Data.MaxHealth);
+        hudController.UpdateHealth(currentHealth, HealthPercentage);
+    }
+
+    private void AddPotions(int potionsGained)
+    {
+        currentPotions += potionsGained;
+        currentPotions = Mathf.Clamp(currentPotions, 0, Data.MaxPotions);
+        hudController.UpdatePotionCount(currentPotions);
     }
 }

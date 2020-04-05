@@ -65,7 +65,7 @@ public class BattleManager : MonoBehaviour
     private void Player_OnActionSucceded()
     {
         currentEnemy.ApplyDamage(player.Data.AttackPower, out int reducedHealth);
-        player.IncreaseScore(currentEnemy.Data.PointsPerHealth * reducedHealth);
+        player.AddScore(currentEnemy.Data.PointsPerHealth * reducedHealth);
 
         if (!currentEnemy.IsAlive)
         {
