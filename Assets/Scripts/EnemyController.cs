@@ -1,10 +1,5 @@
-﻿using DG.Tweening;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using TMPro;
+﻿using System;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class EnemyController : MonoBehaviour
 {
@@ -16,9 +11,11 @@ public class EnemyController : MonoBehaviour
         RemainingTurnsToAttackInt = "RemainingTurnsToAttack",
         HealthInt = "Health";
 
-
     private EnemyAnimatorController animator;
-    private int currentHealth, remainingTurnsToAttack;
+    private int 
+        currentHealth,
+        remainingTurnsToAttack,
+        animationControlCount;
 
     private float HealthPercentage => (float)currentHealth / Data.MaxHealth;
 
@@ -59,23 +56,31 @@ public class EnemyController : MonoBehaviour
         UpdateRemainingTurnsToAttack(Data.TurnsToAttack);
     }
 
+    public void CheckIfShouldAttack()
+    {
+        UpdateRemainingTurnsToAttack(remainingTurnsToAttack - 1);
+    }
+
     public void ApplyDamage(int damageReceived, out int reducedHealth)
     {
         currentHealth -= damageReceived;
         reducedHealth = IsAlive ? damageReceived : damageReceived + currentHealth;
         currentHealth = Mathf.Clamp(currentHealth, 0, Data.MaxHealth);
 
+        hudController.UpdateHealth(currentHealth, HealthPercentage);
+
+        UpdateAnimatorState();
+    }
+
+    private void UpdateAnimatorState()
+    {
+        UpdateRemainingTurnsToAttack(remainingTurnsToAttack + 1);
         animator.SetInteger(HealthInt, currentHealth);
         animator.SetTrigger(GetHitTrigger);
 
-        hudController.UpdateHealth(currentHealth, HealthPercentage);
-
-        UpdateRemainingTurnsToAttack(remainingTurnsToAttack + 1);
-    }
-
-    public void CheckIfShouldAttack()
-    {
-        UpdateRemainingTurnsToAttack(remainingTurnsToAttack - 1);
+        //This is used to avoid sending the OnDmgAnimationComplete event
+        //back to the BattleManager during another hit animation
+        animationControlCount++;
     }
 
     private void UpdateRemainingTurnsToAttack(int turnsToAttack)
@@ -87,7 +92,12 @@ public class EnemyController : MonoBehaviour
 
     private void Animator_OnDmgAnimationComplete()
     {
-        OnDmgAnimationComplete?.Invoke();
+        //This checks avoid the BattleManager receiving the OnDmgAnimationComplete
+        //while the death animation is playing
+        if (--animationControlCount == 0)
+        {
+            OnDmgAnimationComplete?.Invoke();
+        }
     }
 
     private void Animator_OnAtkAnimationComplete()

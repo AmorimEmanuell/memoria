@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class BattleManager : MonoBehaviour
 {
@@ -99,7 +96,7 @@ public class BattleManager : MonoBehaviour
 
     private void CalculatePotionDroppingChance()
     {
-        if (UnityEngine.Random.value <= PotionDroppingChance)
+        if (Random.value <= PotionDroppingChance)
         {
             potionSpawner.Spawn(currentEnemy.ModelPosition);
         }
