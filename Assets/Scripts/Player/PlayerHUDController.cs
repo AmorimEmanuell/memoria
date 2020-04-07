@@ -8,16 +8,20 @@ using TMPro;
 public class PlayerHUDController : MonoBehaviour
 {
     [SerializeField] private Button potionBtn = default;
+    [SerializeField] private RectTransform potionCountBg = default;
     [SerializeField] private TextMeshProUGUI potionCount = default;
     [SerializeField] private Slider healthSlider = default;
     [SerializeField] private Image healthFill = default;
     [SerializeField] private Gradient healthColorGradient = default;
     [SerializeField] private TextMeshProUGUI displayedScore = default;
 
-    private const float AnimationTime = 0.5f;
+    private const float
+        AnimationTime = 0.5f,
+        PotionCountAnimationScale = 1.3f,
+        ScoreAnimationScale = 1.5f;
 
     private RectTransform displayedScoreRect;
-    private Coroutine updateScoreTextAnimation;
+    private Coroutine updateScoreTextRoutine;
 
     public Action OnPotionButtonClicked;
 
@@ -56,6 +60,11 @@ public class PlayerHUDController : MonoBehaviour
     public void UpdatePotionCount(int currentPotions)
     {
         potionCount.text = currentPotions.ToString();
+
+        potionCountBg.DOScale(PotionCountAnimationScale, AnimationTime / 2).OnComplete(() =>
+        {
+            potionCountBg.DOScale(1f, AnimationTime / 2);
+        });
     }
 
     public void ActivatePotionButton(bool active)
@@ -65,31 +74,31 @@ public class PlayerHUDController : MonoBehaviour
 
     public void UpdateScore(int currentScore)
     {
-        displayedScoreRect.DOScale(1.5f, AnimationTime).OnComplete(() =>
+        displayedScoreRect.DOScale(ScoreAnimationScale, AnimationTime).OnComplete(() =>
         {
             displayedScoreRect.DOScale(1f, AnimationTime);
         });
 
-        if (updateScoreTextAnimation != null)
+        if (updateScoreTextRoutine != null)
         {
-            StopCoroutine(updateScoreTextAnimation);
+            StopCoroutine(updateScoreTextRoutine);
         }
 
-        updateScoreTextAnimation = StartCoroutine(UpdateScoreAnimation(currentScore));
+        updateScoreTextRoutine = StartCoroutine(UpdateScoreTextRoutine(currentScore));
     }
 
-    private IEnumerator UpdateScoreAnimation(int nextDisplayedScore)
+    private IEnumerator UpdateScoreTextRoutine(int nextDisplayedScore)
     {
-        var progress = 0f;
         var elapsedTime = 0f;
         var currentDisplayedScore = int.Parse(displayedScore.text);
 
-        while (progress < 1)
+        while (elapsedTime < AnimationTime)
         {
             elapsedTime += Time.deltaTime;
-            progress = Mathf.Clamp01(elapsedTime / AnimationTime);
+            var progress = Mathf.Clamp01(elapsedTime / AnimationTime);
 
-            var displayScore = (int)Mathf.Lerp(currentDisplayedScore, nextDisplayedScore, progress);
+            var displayScore = Mathf.Lerp(currentDisplayedScore, nextDisplayedScore, progress);
+            displayScore = Mathf.CeilToInt(displayScore);
             displayedScore.text = displayScore.ToString();
 
             yield return null;
