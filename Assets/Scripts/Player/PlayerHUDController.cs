@@ -13,6 +13,7 @@ public class PlayerHUDController : MonoBehaviour
     [SerializeField] private Slider healthSlider = default;
     [SerializeField] private Image healthFill = default;
     [SerializeField] private Gradient healthColorGradient = default;
+    [SerializeField] private GameObject scorePanel = default;
     [SerializeField] private TextMeshProUGUI displayedScore = default;
 
     private const float
@@ -103,5 +104,10 @@ public class PlayerHUDController : MonoBehaviour
 
             yield return null;
         }
+    }
+
+    public void ActivateScore(bool active)
+    {
+        scorePanel.SetActive(active);
     }
 }

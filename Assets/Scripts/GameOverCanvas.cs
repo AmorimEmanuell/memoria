@@ -1,31 +1,50 @@
-﻿using UnityEngine;
+﻿using DG.Tweening;
+using TMPro;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class GameOverCanvas : MonoBehaviour
 {
-    [SerializeField] private Canvas _canvas = default;
-    [SerializeField] private Button _restartBtn = default;
+    [SerializeField] private Canvas canvas = default;
+    [SerializeField] private RectTransform panel = default;
+    [SerializeField] private Button restartBtn = default;
+    [SerializeField] private TextMeshProUGUI scoreCount = default;
+
+    private const float AnimationTime = 0.5f;
 
     private void Awake()
     {
         Events.instance.AddListener<PlayerDefeatEvent>(OnPlayerDefeatEvent);
-        _restartBtn.onClick.AddListener(OnRestartBtnClicked);
+        restartBtn.onClick.AddListener(OnRestartBtnClicked);
     }
 
     private void OnDestroy()
     {
         Events.instance.RemoveListener<PlayerDefeatEvent>(OnPlayerDefeatEvent);
-        _restartBtn.onClick.RemoveAllListeners();
+        restartBtn.onClick.RemoveAllListeners();
     }
 
     private void OnPlayerDefeatEvent(PlayerDefeatEvent e)
     {
-        _canvas.enabled = true;
+        scoreCount.text = e.FinalScore.ToString();
+        panel.localScale = Vector3.zero;
+        restartBtn.interactable = false;
+        canvas.enabled = true;
+
+        panel.DOScale(1, AnimationTime).SetEase(Ease.OutBack).OnComplete(() =>
+        {
+            restartBtn.interactable = true;
+        });
     }
 
     private void OnRestartBtnClicked()
     {
-        _canvas.enabled = false;
-        Events.instance.Raise(new RestartEvent());
+        restartBtn.interactable = false;
+
+        panel.DOScale(0, AnimationTime).OnComplete(() =>
+        {
+            canvas.enabled = false;
+            Events.instance.Raise(new RestartEvent());
+        });
     }
 }
