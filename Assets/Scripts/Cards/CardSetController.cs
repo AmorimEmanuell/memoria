@@ -29,7 +29,7 @@ public class CardSetController : MonoBehaviour
         SetCardsInteractable(true);
     }
 
-    private void ClearRemainingCards()
+    public void ClearRemainingCards()
     {
         for (var i = 0; i < _currentSet.Count; i++)
         {

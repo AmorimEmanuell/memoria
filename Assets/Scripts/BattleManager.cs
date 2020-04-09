@@ -25,7 +25,7 @@ public class BattleManager : MonoBehaviour
 
     private void Start()
     {
-        AdvanceToNextRound();
+        AdvanceToNextEnemy();
     }
 
     private void OnDestroy()
@@ -36,13 +36,22 @@ public class BattleManager : MonoBehaviour
         Events.instance.RemoveListener<RestartEvent>(OnGameRestart);
     }
 
-    private void AdvanceToNextRound()
+    private void AdvanceToNextEnemy()
     {
-        PrepareEnemy();
-        PrepareGameSet();
+        PrepareNextEnemy();
+        PrepareNextGameRound();
     }
 
-    private void PrepareEnemy()
+    private void PrepareNextEnemy()
+    {
+        DeactivateCurrentEnemy();
+
+        currentEnemy = enemySpawner.SpawnNewEnemy();
+        currentEnemy.OnAtkAnimationComplete += Enemy_OnAtkAnimationComplete;
+        currentEnemy.OnDmgAnimationComplete += Enemy_OnDmgAnimationComplete;
+    }
+
+    private void DeactivateCurrentEnemy()
     {
         if (currentEnemy != null)
         {
@@ -50,13 +59,9 @@ public class BattleManager : MonoBehaviour
             currentEnemy.OnDmgAnimationComplete -= Enemy_OnDmgAnimationComplete;
             currentEnemy.gameObject.SetActive(false);
         }
-
-        currentEnemy = enemySpawner.SpawnNewEnemy();
-        currentEnemy.OnAtkAnimationComplete += Enemy_OnAtkAnimationComplete;
-        currentEnemy.OnDmgAnimationComplete += Enemy_OnDmgAnimationComplete;
     }
 
-    private void PrepareGameSet()
+    private void PrepareNextGameRound()
     {
         var enemyGrid = currentEnemy.Data.GridSize;
         cardSetController.SetupNewGame(enemyGrid.x, enemyGrid.y);
@@ -84,13 +89,13 @@ public class BattleManager : MonoBehaviour
         {
             if (cardSetController.RemainingPairs == 0)
             {
-                PrepareGameSet();
+                PrepareNextGameRound();
             }
         }
         else
         {
             CalculatePotionDroppingChance();
-            AdvanceToNextRound();
+            AdvanceToNextEnemy();
         }
     }
 
@@ -108,14 +113,24 @@ public class BattleManager : MonoBehaviour
 
         if (!player.IsAlive)
         {
-            cardSetController.SetCardsInteractable(false);
-            Events.instance.Raise(new PlayerDefeatEvent());
+            PrepareGameOver();
         }
+    }
+
+    private void PrepareGameOver()
+    {
+        cardSetController.SetCardsInteractable(false);
+        player.ActivateScore(false);
+
+        DeactivateCurrentEnemy();
+        cardSetController.ClearRemainingCards();
+
+        Events.instance.Raise(new PlayerDefeatEvent(player.CurrentScore));
     }
 
     private void OnGameRestart(RestartEvent e)
     {
-        player.ResetDefaultValues();
-        AdvanceToNextRound();
+        player.InitializeState();
+        AdvanceToNextEnemy();
     }
 }

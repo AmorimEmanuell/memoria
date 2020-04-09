@@ -9,13 +9,13 @@ public class PlayerController : MonoBehaviour
 
     private int
         currentHealth,
-        currentPotions,
-        currentScore;
+        currentPotions;
 
     private float HealthPercentage => (float)currentHealth / Data.MaxHealth;
 
     public PlayerSaveData Data { get; private set; }
     public bool IsAlive => currentHealth > 0;
+    public int CurrentScore { get; private set; }
 
     private void Awake()
     {
@@ -27,7 +27,7 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
-        ResetDefaultValues();
+        InitializeState();
     }
 
     private void OnDestroy()
@@ -36,12 +36,13 @@ public class PlayerController : MonoBehaviour
         Events.instance.RemoveListener<PotionPickedEvent>(OnPotionPickedup);
     }
 
-    public void ResetDefaultValues()
+    public void InitializeState()
     {
         currentHealth = Data.MaxHealth;
         currentPotions = Data.MaxPotions;
-        currentScore = 0;
+        CurrentScore = 0;
 
+        hudController.ActivateScore(true);
         hudController.SetInitialValues(Data);
     }
 
@@ -93,8 +94,8 @@ public class PlayerController : MonoBehaviour
 
     public void AddScore(int scoreGained)
     {
-        currentScore += scoreGained;
-        hudController.UpdateScore(currentScore);
+        CurrentScore += scoreGained;
+        hudController.UpdateScore(CurrentScore);
     }
 
     private void AddHealth(int healthGained)
@@ -109,5 +110,10 @@ public class PlayerController : MonoBehaviour
         currentPotions += potionsGained;
         currentPotions = Mathf.Clamp(currentPotions, 0, Data.MaxPotions);
         hudController.UpdatePotionCount(currentPotions);
+    }
+
+    public void ActivateScore(bool active)
+    {
+        hudController.ActivateScore(active);
     }
 }
