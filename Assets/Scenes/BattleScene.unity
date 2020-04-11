@@ -1121,8 +1121,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cd8f60276ea64f468d636846a97c034, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _camera: {fileID: 963194227}
-  _rayMask:
+  raycastCamera: {fileID: 963194227}
+  rayMask:
     serializedVersion: 2
     m_Bits: 256
 --- !u!1 &705507993

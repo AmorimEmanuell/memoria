@@ -3,69 +3,101 @@ using UnityEngine;
 
 public class InteractionRaycaster : MonoBehaviour
 {
-    [SerializeField] private Camera _camera = default;
-    [SerializeField] private LayerMask _rayMask = default;
+    [SerializeField] private Camera raycastCamera = default;
+    [SerializeField] private LayerMask rayMask = default;
 
     private const float ClickThreshold = 0.3f;
 
-    private Dictionary<Collider, IInteractable> _savedInteractables = new Dictionary<Collider, IInteractable>();
-    private IInteractable _currentInteractable;
-    private float _touchDownTime;
-    private RaycastHit[] _hit = new RaycastHit[1];
+    private readonly Dictionary<Collider, IInteractable> savedInteractables = new Dictionary<Collider, IInteractable>();
+    private IInteractable currentInteractable;
+    private float touchDownTime;
+    private readonly RaycastHit[] hit = new RaycastHit[1];
 
     private void Update()
     {
+#if UNITY_ANDROID && !UNITY_EDITOR
+        var touches = Input.touches;
+        if (touches.Length > 0)
+        {
+            var touch = touches[0];
+
+            switch (touch.phase)
+            {
+                case TouchPhase.Began:
+                    HandleTouchDown(touch.position);
+                    break;
+
+                case TouchPhase.Ended:
+                    HandleTouchUp(touch.position);
+                    break;
+
+                default:
+                    break;
+            }
+        }
+#else
         if (Input.GetMouseButtonDown(0))
-            HandleTouchDown();
+        {
+            HandleTouchDown(Input.mousePosition);
+        }
         else if (Input.GetMouseButtonUp(0))
-            HandleTouchUp();
+        {
+            HandleTouchUp(Input.mousePosition);
+        }
+#endif
     }
 
-    private void HandleTouchDown()
+    private void HandleTouchDown(Vector3 inputPosition)
     {
-        _touchDownTime = Time.unscaledTime;
+        touchDownTime = Time.unscaledTime;
 
-        var interactable = GetInteractable();
+        var interactable = GetInteractable(inputPosition);
         if (interactable != null)
         {
-            if (_currentInteractable != interactable)
-                _currentInteractable = interactable;
+            if (currentInteractable != interactable)
+            {
+                currentInteractable = interactable;
+            }
 
-            _currentInteractable.OnTouchDown();
+            currentInteractable.OnTouchDown();
         }
     }
 
-    private void HandleTouchUp()
+    private void HandleTouchUp(Vector3 inputPosition)
     {
-        var interactable = GetInteractable();
+        var interactable = GetInteractable(inputPosition);
         if (interactable != null)
         {
-            if (_currentInteractable == interactable)
+            if (currentInteractable == interactable)
             {
-                _currentInteractable.OnTouchUp();
+                currentInteractable.OnTouchUp();
 
-                if (Time.unscaledTime - _touchDownTime <= ClickThreshold)
-                    _currentInteractable.OnClick();
+                if (Time.unscaledTime - touchDownTime <= ClickThreshold)
+                {
+                    currentInteractable.OnClick();
+                }
             }
         }
 
-        _currentInteractable = null;
+        currentInteractable = null;
     }
 
-    private IInteractable GetInteractable()
+    private IInteractable GetInteractable(Vector3 inputPosition)
     {
-        var ray = _camera.ScreenPointToRay(Input.mousePosition);
-        if (Physics.RaycastNonAlloc(ray, _hit, Mathf.Infinity, _rayMask) > 0)
+        var ray = raycastCamera.ScreenPointToRay(inputPosition);
+        if (Physics.RaycastNonAlloc(ray, hit, Mathf.Infinity, rayMask) > 0)
         {
-            var collider = _hit[0].collider;
+            var collider = hit[0].collider;
 
-            if (_savedInteractables.ContainsKey(collider))
-                return _savedInteractables[collider];
+            if (savedInteractables.ContainsKey(collider))
+            {
+                return savedInteractables[collider];
+            }
 
             var interactable = collider.GetComponent<IInteractable>();
             if (interactable != null)
             {
-                _savedInteractables.Add(collider, interactable);
+                savedInteractables.Add(collider, interactable);
                 return interactable;
             }
         }
