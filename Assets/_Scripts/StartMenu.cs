@@ -17,7 +17,7 @@ public class StartMenu : MonoBehaviour
 
     private void OnStartButtonClicked()
     {
-        throw new NotImplementedException();
+        SceneLoader.Instance.LoadScene("BattleScene");
     }
 
     private void OnHighScoreButtonClicked()
