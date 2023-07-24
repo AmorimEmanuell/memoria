@@ -2,6 +2,7 @@
 This is a puzzle based RPG game in which you defeat hordes of monsters by mastering concentration and memory skills.
 
 Still a work in progress. You can download it here: [MemoriaRPG](../assets/Builds/memoriaRPG_0.1.apk). This is an .apk, so you'll need to install it manually in your device with adb. Alternatively you can download this repo and build yourself or try in the UnityEditor.
+Current Unity Version: 2022.3.5f1 LTS
 
 ## v0.1
 ![CoreCombatScreen](../assets/Captures/memoriarpgv0.1core.jpg)
