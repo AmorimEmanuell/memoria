@@ -16,4 +16,10 @@ public class HighscoreWindow : WindowPanel
     {
         _button.onClick.RemoveAllListeners();
     }
+
+    public override void Open()
+    {
+        base.Open();
+        _highscore.SetText("{0}", HighscoreDataManager.GetHighscore());
+    }
 }
