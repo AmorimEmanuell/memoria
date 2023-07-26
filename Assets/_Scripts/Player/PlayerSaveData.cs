@@ -1,15 +1,10 @@
-﻿using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
+﻿using System;
 using UnityEngine;
 
-[System.Serializable]
-public class PlayerSaveData
+[Serializable]
+public class PlayerSaveData : ISaveData
 {
-    [SerializeField] private int
-        _maxHealth,
-        _attackPower,
-        _maxPotions,
-        _potionStrength;
+    [SerializeField] private int _maxHealth, _attackPower, _maxPotions, _potionStrength;
 
     private const string Filename = "Player.savedata";
 
@@ -28,26 +23,13 @@ public class PlayerSaveData
 
     public static PlayerSaveData Load()
     {
-        var filePath = Path.Combine(Application.persistentDataPath, Filename);
-
-        BinaryFormatter bf = new BinaryFormatter();
-        PlayerSaveData playerData;
-
-        if (File.Exists(filePath))
+        var fileExists = FileUtils.TryLoad<PlayerSaveData>(Filename, out var playerSaveData);
+        if (!fileExists)
         {
-            FileStream fs = File.OpenRead(filePath);
-            playerData = (PlayerSaveData)bf.Deserialize(fs);
-            fs.Close();
-        }
-        else
-        {
-            playerData = GetInitialValues();
-            FileStream fs = File.Create(filePath);
-            bf.Serialize(fs, playerData);
-            fs.Close();
+            playerSaveData = GetInitialValues();
         }
 
-        return playerData;
+        return playerSaveData;
     }
 
     private static PlayerSaveData GetInitialValues()
