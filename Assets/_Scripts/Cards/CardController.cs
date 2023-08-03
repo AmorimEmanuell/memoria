@@ -48,21 +48,18 @@ public class CardController : MonoBehaviour, IInteractable
         });
     }
 
-    public void Shrink(Action onComplete = null)
+    public void Shrink(Action<CardController> onComplete = null)
     {
         transform.DOScale(0f, RotateDuration).OnComplete(() =>
         {
-            ReturnToPool();
-            onComplete?.Invoke();
+            onComplete?.Invoke(this);
         });
     }
 
-    public void ReturnToPool()
+    public void ResetState()
     {
         transform.localScale = Vector3.one * _originalScale;
         transform.localRotation = Quaternion.identity;
-
-        ObjectPooler.Instance.Return(gameObject);
     }
 
     public void ForceIsInteractable(bool IsInteractable)

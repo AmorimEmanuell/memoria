@@ -34,7 +34,7 @@ public class CardSetController : MonoBehaviour
         for (var i = 0; i < _currentSet.Count; i++)
         {
             _currentSet[i].OnFaceRevealed -= Card_OnFaceRevealed;
-            _currentSet[i].ReturnToPool();
+            ResetCard(_currentSet[i]);
         }
 
         _currentSet.Clear();
@@ -51,11 +51,11 @@ public class CardSetController : MonoBehaviour
         if (_lastRevealedCard.CardId == currentRevealedCard.CardId)
         {
             _lastRevealedCard.OnFaceRevealed -= Card_OnFaceRevealed;
-            _lastRevealedCard.Shrink();
+            _lastRevealedCard.Shrink(ResetCard);
             _currentSet.Remove(_lastRevealedCard);
 
             currentRevealedCard.OnFaceRevealed -= Card_OnFaceRevealed;
-            currentRevealedCard.Shrink();
+            currentRevealedCard.Shrink(ResetCard);
             _currentSet.Remove(currentRevealedCard);
 
             OnPairFound?.Invoke();
@@ -69,6 +69,12 @@ public class CardSetController : MonoBehaviour
         }
 
         _lastRevealedCard = null;
+    }
+
+    private void ResetCard(CardController card)
+    {
+        card.ResetState();
+        ObjectPooler.Instance.Return(card.gameObject);
     }
 
     public void SetCardsInteractable(bool IsInteractable)
