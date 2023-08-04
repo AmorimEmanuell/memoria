@@ -31,6 +31,8 @@ public class CardSetController : MonoBehaviour
 
     public void ClearRemainingCards()
     {
+        _lastRevealedCard = null;
+
         for (var i = 0; i < _currentSet.Count; i++)
         {
             _currentSet[i].OnFaceRevealed -= Card_OnFaceRevealed;
