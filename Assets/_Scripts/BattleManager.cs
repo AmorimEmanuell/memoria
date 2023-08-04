@@ -5,13 +5,6 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private CardSetController cardSetController = default;
     [SerializeField] private EnemySpawner enemySpawner = default;
     [SerializeField] private PlayerController player = default;
-    [SerializeField] private PotionSpawner potionSpawner = default;
-
-#if D
-    private const float PotionDroppingChance = 1f;
-#else
-    private const float PotionDroppingChance = 0.1f;
-#endif
 
     private EnemyController currentEnemy;
 
@@ -94,16 +87,8 @@ public class BattleManager : MonoBehaviour
         }
         else
         {
-            CalculatePotionDroppingChance();
+            Events.instance.Raise(new EnemyDefeatEvent(currentEnemy));
             AdvanceToNextEnemy();
-        }
-    }
-
-    private void CalculatePotionDroppingChance()
-    {
-        if (Random.value <= PotionDroppingChance)
-        {
-            potionSpawner.Spawn(currentEnemy.ModelPosition);
         }
     }
 

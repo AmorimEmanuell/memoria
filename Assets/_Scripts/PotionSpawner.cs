@@ -1,5 +1,4 @@
 ﻿using DG.Tweening;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,9 +7,14 @@ public class PotionSpawner : MonoBehaviour
     [SerializeField] private PotionPickup potionPrefab = default;
 
     private const int MaxActivePotions = 3;
-
     private readonly List<PotionPickup> potions = new List<PotionPickup>(MaxActivePotions);
     private int activePotions;
+
+#if D
+    private const float PotionDroppingChance = 1f;
+#else
+    private const float PotionDroppingChance = 0.1f;
+#endif
 
     private void Awake()
     {
@@ -23,6 +27,8 @@ public class PotionSpawner : MonoBehaviour
 
             potions.Add(potion);
         }
+
+        Events.instance.AddListener<EnemyDefeatEvent>(OnEnemyDefeated);
     }
 
     private void OnDestroy()
@@ -32,6 +38,8 @@ public class PotionSpawner : MonoBehaviour
             potions[i].OnPickup -= Potion_OnPickup;
             potions[i].OnFadeRoutineComplete -= Potion_OnFadeRoutineComplete;
         }
+
+        Events.instance.RemoveListener<EnemyDefeatEvent>(OnEnemyDefeated);
     }
 
     private void Potion_OnPickup(PotionPickup potion)
@@ -54,14 +62,14 @@ public class PotionSpawner : MonoBehaviour
         activePotions--;
     }
 
-    public void Spawn(Vector3 location)
+    private void OnEnemyDefeated(EnemyDefeatEvent e)
     {
         var potion = SelectAvailablePotion();
-        potion.transform.position = location;
+        potion.transform.position = e.EnemyController.ModelPosition;
         potion.gameObject.SetActive(true);
 
         var direction = CalculateMoveDirection();
-        potion.transform.DOMove(location + direction, 0.5f).OnComplete(() =>
+        potion.transform.DOMove(e.EnemyController.ModelPosition + direction, 0.5f).OnComplete(() =>
         {
             potion.PrepareToFade();
         });
